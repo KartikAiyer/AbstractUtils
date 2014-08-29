@@ -98,6 +98,12 @@
 				Name="LinkerOutputType"
 				Value="Executable"/>
 		</List>
+		<Libs PreObjects="0">
+		</Libs>
+		<Includes>
+			<Include Dir="/usr/include/"/>
+			<Include Dir="/usr/include/c++/4.2.1/"/>
+		</Includes>
 	</Config>
 	<Config
 		Name="Release"
@@ -191,6 +197,12 @@
 				Name="LinkerOutputType"
 				Value="Executable"/>
 		</List>
+		<Libs PreObjects="0">
+		</Libs>
+		<Includes>
+			<Include Dir="/usr/include/"/>
+			<Include Dir="/usr/include/c++/4.2.1/"/>
+		</Includes>
 	</Config>
 	<Files>
 		<Folder
