@@ -1,18 +1,34 @@
 /**
- * Confidential!!!
- * Source code property of Blue Clover Design LLC.
+ * The MIT License (MIT)
  *
- * Demonstration, distribution, replication, or other use of the
- * source codes is NOT permitted without prior written consent
- * from Blue Clover Design.
+ * Copyright (c) <2014> <Kartik Aiyer>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
-
-#include "Utilities/Pool.h"
-#include "Utilities/Logable.h"
+#include "Pool.h"
 #include <assert.h>
+#include <string.h>
+#include "Logable.h"
 
 static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
+
 #undef LOG
 #define LOG( str, ... )   Log( &s_poolLog, str, ##__VA_ARGS__ )
 bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBufferSize, uint32_t numUnits )
@@ -23,7 +39,8 @@ bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBuffer
       pPool->pBackingStore = pBackingBuffer;
       pPool->numOfUnits = numUnits;
       pPool->pHead = 0;
-      if ( wiced_rtos_init_mutex( &pPool->mutex ) == WICED_SUCCESS ) {
+      pPool->mutex = KMutexCreate( "PoolMutex" );
+      if ( pPool->mutex ) {
         uint32_t i;
         uint32_t jumpBy = backingBufferSize / numUnits;
         LOG( "Adding Buffer of size %d to pool, pool sizse: %d", jumpBy, backingBufferSize );
@@ -48,10 +65,10 @@ bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBuffer
 void PoolRelease( MemPool* pPool )
 {
   if ( pPool ) {
-    wiced_result_t result; 
-    result = wiced_rtos_lock_mutex( &pPool->mutex );
-    if ( result == WICED_SUCCESS ) {
-      wiced_rtos_deinit_mutex( &pPool->mutex );
+    bool result = KMutexLock( &pPool->mutex, WAIT_FOREVER );
+    if ( result ) {
+      KMutexDelete( pPool->mutex );
+      pPool->mutex = 0;
       memset( pPool->pBackingStore, 0, pPool->backingBufferSize );
       pPool->pHead = 0;
       pPool->pBackingStore = 0;
@@ -67,10 +84,10 @@ void* PoolAlloc( MemPool* pPool )
 {
   void* retval = 0;
   if ( pPool ) {
-    if ( wiced_rtos_lock_mutex( &pPool->mutex ) == WICED_SUCCESS ) {
+    if ( KMutexLock( pPool->mutex, WAIT_FOREVER ) ) {
       KLIST_HEAD_POP( pPool->pHead, retval );
       LOG( "%s(): Retval: %p", __FUNCTION__, retval );
-      wiced_rtos_unlock_mutex( &pPool->mutex );
+      KMutexUnlock( pPool->mutex );
     }
     else
     {
@@ -90,9 +107,9 @@ void PoolFree( MemPool* pPool, void* buf )
       LOG( "%s(): !!! CRITICAL ERROR. BUFFER TO FREE DOES NOT BELONG TO POOL", __FUNCTION__ );
       assert( 0 );
     }
-    if ( wiced_rtos_lock_mutex( &pPool->mutex ) == WICED_SUCCESS ) {
+    if ( KMutexLock( &pPool->mutex, WAIT_FOREVER ) ) {
       KLIST_HEAD_PREPEND( pPool->pHead, buf );
-      wiced_rtos_unlock_mutex( &pPool->mutex );
+      KMutexUnlock( &pPool->mutex );
     }
     else
     {

@@ -6,7 +6,7 @@
  * from Blue Clover Devices. 
  */
 
-#include "Utilities/StateMachine.h"
+#include "StateMachine.h"
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>

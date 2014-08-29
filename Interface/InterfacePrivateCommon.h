@@ -24,7 +24,9 @@
 #ifndef __INTERFACE_PRIVATE_COMMON_H__
 #define __INTERFACE_PRIVATE_COMMON_H__
 
-#include <stdboolh.>
+#include <stdbool.h>
 #include <stdint.h>
 
+#define WAIT_FOREVER         ( 0xFFFFFFFF )
+#define NO_SLEEP             ( 0x0 )
 #endif // __INTERFACE_PRIVATE_COMMON_H__

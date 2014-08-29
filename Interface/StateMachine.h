@@ -10,7 +10,7 @@
 #define __STATE_MACHINE_H__
 
 
-#include "Utilities/State.h"
+#include "State.h"
 /** Maximum number of states that a state machine can have. */
 #define STATE_MAC_MAX_STATES        20
 

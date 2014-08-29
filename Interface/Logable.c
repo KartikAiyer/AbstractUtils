@@ -13,7 +13,6 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <string.h>
-#include "wiced_time.h"
 
 Logable g_generalLogger = { .prefix = 0, .enabled = true };  
 
@@ -22,8 +21,7 @@ void Log( Logable *pLog, const char* pStr, ... )
   va_list arguments;
   va_start(arguments, pStr );
   if( pLog && pLog->enabled ) {
-    wiced_time_t time = { 0 };
-    wiced_time_get_time( &time );
+    uint32_t time = 0;
     if( pLog->prefix ) {
       printf("[%010u ms - %s]: ", ( unsigned int )time, pLog->prefix );
     }

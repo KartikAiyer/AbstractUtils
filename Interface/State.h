@@ -12,8 +12,8 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "Utilities/Logable.h"
-#include "Utilities/klist.h"
+#include "Logable.h"
+#include "klist.h"
 
 ///Forward Declarations
 struct _State;

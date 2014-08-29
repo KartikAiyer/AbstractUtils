@@ -7,7 +7,7 @@
  * from Blue Clover Design. 
  */
 
-#include "klist\klist.h"
+#include "klist.h"
 
 void KQueueInit( KQueue* pQueue )
 {

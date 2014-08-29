@@ -11,7 +11,7 @@
 
 
 #include "Klist.h"
-#include "wiced.h"
+#include "MutexInterface.h"
 
 /** @defgroup MemoryPools - A fixed Block mempool api.
  *  Typically we don't want to rely on malloc and free due to
@@ -32,7 +32,7 @@ typedef struct _MemPool
   uint32_t backingBufferSize;
   uint32_t numOfUnits;
   KListHead *pHead;
-  wiced_mutex_t mutex;
+  KMutexHandle mutex;
 }MemPool;
 
 /**
