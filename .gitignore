@@ -1,4 +1,6 @@
 *.vtg
 *.vpwhistu
 AbstractUtils.mak
+Debug
+Release
 

@@ -4,15 +4,15 @@
 	VendorName="SlickEdit"
 	TemplateName="GNU C/C++"
 	WorkingDir="."
-	BuildSystem="automakefile"
-	BuildMakeFile="%rp%rn.mak">
+	BuildSystem="vsbuild"
+	BuildMakeFile="">
 	<Config
 		Name="Debug"
 		Type="gnuc"
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Latest Version">
+		CompilerConfigName="Default Compiler">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -22,7 +22,8 @@
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				ClearProcessBuffer="1">
 				<Exec CmdLine='g++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -42,8 +43,10 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec CmdLine='make -f "%rp%rn.mak" CFG=%b'/>
+				RunFromDir="%rw"
+				Dialog="_gnuc_options_form Compile"
+				ClearProcessBuffer="1">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -51,8 +54,10 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec CmdLine='make -f "%rp%rn.mak" rebuild CFG=%b'/>
+				RunFromDir="%rw"
+				Dialog="_gnuc_options_form Compile"
+				ClearProcessBuffer="1">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
 			</Target>
 			<Target
 				Name="Debug"
@@ -101,8 +106,8 @@
 		<Libs PreObjects="0">
 		</Libs>
 		<Includes>
-			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
 		</Includes>
 	</Config>
 	<Config
@@ -111,7 +116,7 @@
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Latest Version">
+		CompilerConfigName="Default Compiler">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -121,7 +126,8 @@
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				ClearProcessBuffer="1">
 				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -141,8 +147,10 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec CmdLine='make -f "%rp%rn.mak" CFG=%b'/>
+				RunFromDir="%rw"
+				Dialog="_gnuc_options_form Compile"
+				ClearProcessBuffer="1">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -150,8 +158,10 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec CmdLine='make -f "%rp%rn.mak" rebuild CFG=%b'/>
+				RunFromDir="%rw"
+				Dialog="_gnuc_options_form Compile"
+				ClearProcessBuffer="1">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
 			</Target>
 			<Target
 				Name="Debug"
@@ -200,8 +210,8 @@
 		<Libs PreObjects="0">
 		</Libs>
 		<Includes>
-			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
 		</Includes>
 	</Config>
 	<Files>
@@ -275,9 +285,6 @@
 				N="*.xpm"
 				Recurse="1"
 				Excludes=""/>
-			<F
-				N="AbstractUtils.mak"
-				Type="Makefile"/>
 		</Folder>
 	</Files>
 </Project>
