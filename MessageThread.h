@@ -31,7 +31,7 @@
 
 #define MESSAGE_THREADS_MAX            ( 5 )
 
-typedef KListElem* MessageHandle;
+typedef void* MessageHandle;
 typedef const void* MessageThreadHandle;
 
 /**

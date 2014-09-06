@@ -34,6 +34,6 @@ typedef struct _MessageQueue
 
 bool MessageQueueInitialize( MessageQueue* pQueue );
 void MessageQueueDeInitialize( MessageQueue* pQueue );
-bool MessageQueueEnQueue( MessageQueue* pQueue, KListElem *pItem );
-KListElem* MessageQueueDeQueue( MessageQueue* pQueue );
+bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem );
+void* MessageQueueDeQueue( MessageQueue* pQueue );
 #endif // __MESSAGE_QUEUE_H__

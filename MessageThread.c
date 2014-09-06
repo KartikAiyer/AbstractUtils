@@ -179,7 +179,7 @@ static void Thread( void *arg )
   assert( pThread->semaId );
   KSemaPut( pThread->semaId );
   while( pThread->keepRunning ) {
-    KListElem* pMsg = MessageQueueDeQueue( &pThread->messageQ );
+    void* pMsg = MessageQueueDeQueue( &pThread->messageQ );
     if( pMsg ){
       pThread->fnProcess( arg, pMsg );
       //Delete the message
