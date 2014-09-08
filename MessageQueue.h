@@ -25,6 +25,7 @@
 #define __MESSAGE_QUEUE_H__
 
 #include "MutexInterface.h"
+#include "klist.h"
 
 typedef struct _MessageQueue
 {

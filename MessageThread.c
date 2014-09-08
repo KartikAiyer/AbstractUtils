@@ -46,6 +46,7 @@ typedef struct _MessageThread
 typedef struct _MessageThreadPool
 {
   MessageThread threads[ MESSAGE_THREADS_MAX ];
+  uint32_t poolActData[ ADDITIONAL_POOL_OVERHEAD_IN_ULONG( MESSAGE_THREADS_MAX ) ];
   MemPool threadPool;
   Logable log;
 }MessageThreadPool;
@@ -58,7 +59,7 @@ static void Thread( void *arg );
 
 void MessageThreadSystemInit( void )
 {
-  if ( !PoolCreate( &s_threadPool.threadPool, (uint8_t* )s_threadPool.threads, sizeof(s_threadPool.threads ), MESSAGE_THREADS_MAX ) ) {
+  if ( !PoolCreate( &s_threadPool.threadPool, (uint8_t* )s_threadPool.threads, sizeof(s_threadPool.threads ), MESSAGE_THREADS_MAX, s_threadPool.poolActData ) ) {
     assert( 0 );
   }
 }
@@ -88,7 +89,7 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
         if( PoolCreate( &pThread->pool, 
                     pThreadParams->messageBackingStore, 
                     pThreadParams->messageSize * pThreadParams->messageQDepth, 
-                    pThreadParams->messageQDepth ) ) {
+                    pThreadParams->messageQDepth, pThreadParams->pAdditionalOverhead ) ) {
 
           pThread->threadHandle = KThreadCreate( Thread, pThread, pThreadParams->stackSize, pThreadParams->priority );
           if ( pThread->threadHandle ) {

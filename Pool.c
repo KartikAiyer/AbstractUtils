@@ -25,29 +25,29 @@
 #include "Pool.h"
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 #include "Logable.h"
 
 static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
 
 #undef LOG
 #define LOG( str, ... )   Log( &s_poolLog, str, ##__VA_ARGS__ )
-bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBufferSize, uint32_t numUnits )
+
+
+bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBufferSize, uint32_t numUnits, uint32_t* pFreeBits )
 {
   bool retval = false;
-  if ( pPool && pBackingBuffer ) {
+  if ( pPool && pBackingBuffer && pFreeBits ) {
     if ( backingBufferSize % numUnits == 0 ) {
+      uint32_t i = 0;
       pPool->pBackingStore = pBackingBuffer;
       pPool->numOfUnits = numUnits;
-      pPool->pHead = 0;
+      pPool->pFreeBits = pFreeBits;
+      for ( i = 0; i < CEIL_DIV( numUnits, CHAR_BIT * sizeof( uint32_t ) ); i++ ) {
+        *( pFreeBits + i ) = (uint32_t)-1;
+      }
       pPool->mutex = KMutexCreate( "PoolMutex" );
       if ( pPool->mutex ) {
-        uint32_t i;
-        uint32_t jumpBy = backingBufferSize / numUnits;
-        LOG( "Adding Buffer of size %d to pool, pool sizse: %d", jumpBy, backingBufferSize );
-        for ( i = 0; i < numUnits; i++ ) {
-          KLIST_HEAD_PREPEND( pPool->pHead, pBackingBuffer + ( i * jumpBy ) );
-          LOG( "%p", pBackingBuffer + ( i * jumpBy ) );
-        }
         retval = true;
       }
       else {
@@ -70,8 +70,8 @@ void PoolRelease( MemPool* pPool )
       KMutexDelete( pPool->mutex );
       pPool->mutex = 0;
       memset( pPool->pBackingStore, 0, pPool->backingBufferSize );
-      pPool->pHead = 0;
       pPool->pBackingStore = 0;
+      pPool->pFreeBits = 0;
     }
     else{
       LOG( "%s(): Unable to lock mutex for release", __FUNCTION__ );
@@ -80,13 +80,52 @@ void PoolRelease( MemPool* pPool )
   }
 }
 
+static uint32_t GetFreeIndex( MemPool* pPool, uint32_t levelDeep )
+{
+  if ( levelDeep < CEIL_DIV( pPool->numOfUnits, sizeof( uint32_t ) * CHAR_BIT ) ) {
+    uint32_t bitField = *( pPool->pFreeBits + levelDeep );
+    uint32_t freeLocation = __builtin_ctz( bitField );
+    if ( freeLocation < 32 ) {
+      return ( levelDeep * ( CHAR_BIT * sizeof( uint32_t ) ) + freeLocation );
+    }
+    else {
+      return GetFreeIndex( pPool, levelDeep + 1 );
+    }
+  }
+  else 
+    return levelDeep * ( CHAR_BIT * sizeof( uint32_t ) );
+}
+
+static void MarkIndexFree( MemPool* pPool, uint32_t index, uint32_t levelDeep )
+{
+  if ( index < pPool->numOfUnits ) {
+    if ( index < CHAR_BIT * sizeof( uint32_t ) ) {
+      uint32_t* pBits = pPool->pFreeBits + levelDeep;
+      LOG( "%s(): Old: %p",__FUNCTION__, *pBits );
+      *pBits &= ( 1 << index );
+      LOG( "%s(): New: %p", __FUNCTION__, *pBits );
+    }
+    else {
+      MarkIndexFree( pPool, index - ( CHAR_BIT * sizeof( uint32_t ) ), levelDeep++ );
+    }
+  }
+  else {
+    LOG( "%s(): Invalid Index to free: %d, Total: %d", __FUNCTION__, index, pPool->numOfUnits );
+    assert( 0 );
+  }
+}
+
 void* PoolAlloc( MemPool* pPool )
 {
   void* retval = 0;
   if ( pPool ) {
     if ( KMutexLock( pPool->mutex, WAIT_FOREVER ) ) {
-      KLIST_HEAD_POP( pPool->pHead, retval );
-      LOG( "%s(): Retval: %p", __FUNCTION__, retval );
+      uint32_t freeIndex = GetFreeIndex( pPool, 0 );
+      if ( freeIndex < pPool->numOfUnits ) {
+        uint32_t sizeofUnit = pPool->backingBufferSize / pPool->numOfUnits;
+        retval = ( ( uint8_t* )pPool->pBackingStore + ( sizeofUnit * freeIndex ) );
+        LOG( "%s(): Retval: %p ( index: %d )", __FUNCTION__, retval, freeIndex );
+      }
       KMutexUnlock( pPool->mutex );
     }
     else
@@ -101,14 +140,14 @@ void* PoolAlloc( MemPool* pPool )
 void PoolFree( MemPool* pPool, void* buf )
 {
   if ( pPool && buf ) {
-    KListElem *pElem = (KListElem* )buf;
-    LOG( "Freeing: %p", pElem );
-    if ( pElem->next != 0 || pElem->prev != 0 ) {
-      LOG( "%s(): !!! CRITICAL ERROR. BUFFER TO FREE DOES NOT BELONG TO POOL", __FUNCTION__ );
+    uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore );
+    if ( indexToFree >= pPool->numOfUnits ) {
+      LOG( "%s(): Got out of bounds index to free: %d, ptr: %p (start: %p)", 
+           __FUNCTION__, indexToFree, buf, pPool->pBackingStore );
       assert( 0 );
     }
     if ( KMutexLock( &pPool->mutex, WAIT_FOREVER ) ) {
-      KLIST_HEAD_PREPEND( pPool->pHead, buf );
+      MarkIndexFree( pPool, indexToFree, 0 );
       KMutexUnlock( &pPool->mutex );
     }
     else

@@ -27,9 +27,20 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "klist.h"
+#include "Pool.h"
 
 
 #define MESSAGE_THREADS_MAX            ( 5 )
+
+/**
+ * Clients using the message thread should provide additional 
+ * storage space needed for maintaining the message Queue. The 
+ * amount of storage is proportional to the depth of the queue. 
+ * This macro provides a compile time method of determining the 
+ * amount of overhead and can be used to create the necessary 
+ * static storage. 
+ */
+#define MESSAGE_THREAD_OVERHEAD_IN_ULONG( messageQueueDepth )   ADDITIONAL_POOL_OVERHEAD_IN_ULONG( messageQueueDepth )
 
 typedef void* MessageHandle;
 typedef const void* MessageThreadHandle;
@@ -69,6 +80,9 @@ typedef struct _MessageThreadDef
   uint8_t* messageBackingStore;
   uint32_t messageQDepth;   /**< The number of messages that can Q up in the thread  */
   uint32_t messageSize;     /**< The size of each message processed by the thread */
+  uint32_t *pAdditionalOverhead; /**< The client must also provide sotorage for Message Thread overhead. 
+                                     The amount to be provided, should be calculated using the macro 
+                                     MESSAGE_THREAD_OVERHEAD_IN_ULONG */
   void *pPrivateData;       /**< Private data that is passed to the thread functions. Holds thread state. */
   MessageThreadInit fnInit; /**< Thread Initialization function */
   MessageThreadProcess fnProcess; /**< Function to process each incoming message */
@@ -78,7 +92,7 @@ typedef struct _MessageThreadDef
  * A Convenience method used to create a MessageThreadDef to 
  * be used with message Thread Create. 
  */
-#define MESSAGE_THREAD_DEF( name, stkSz, pri, msgBackStore, qDepth, msgType, msgCount, priv, init, process )\
+#define MESSAGE_THREAD_DEF( name, stkSz, pri, msgBackStore, qDepth, msgType, pOverhead, msgCount, priv, init, process )\
 const MessageThreadDef messageThreadDef_##name =\
 {\
   .threadName = #name,\
@@ -88,6 +102,7 @@ const MessageThreadDef messageThreadDef_##name =\
   .messageQDepth = qDepth,\
   .messageSize = sizeof(msgType),\
   .messagePoolCount = msgCount,\
+  .pAdditionalOverhead = pOverhead,\
   .pPrivateData = priv,\
   .fnInit = init,\
   .fnProcess = process\
