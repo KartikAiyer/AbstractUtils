@@ -4,15 +4,14 @@
 	VendorName="SlickEdit"
 	TemplateName="GNU C/C++"
 	WorkingDir="."
-	BuildSystem="vsbuild"
-	BuildMakeFile="">
+	BuildSystem="vsbuild">
 	<Config
 		Name="Debug"
 		Type="gnuc"
 		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Default Compiler">
+		OutputFile="%bdPosixInterface"
+		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -22,8 +21,7 @@
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw"
-				ClearProcessBuffer="1">
+				RunFromDir="%rw">
 				<Exec CmdLine='g++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -40,24 +38,22 @@
 			<Target
 				Name="Build"
 				MenuCaption="&amp;Build"
+				Dialog="_gnuc_options_form Compile"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw"
-				Dialog="_gnuc_options_form Compile"
-				ClearProcessBuffer="1">
-				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
 			</Target>
 			<Target
 				Name="Rebuild"
 				MenuCaption="&amp;Rebuild"
+				Dialog="_gnuc_options_form Compile"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw"
-				Dialog="_gnuc_options_form Compile"
-				ClearProcessBuffer="1">
-				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
 			</Target>
 			<Target
 				Name="Debug"
@@ -103,11 +99,9 @@
 				Name="LinkerOutputType"
 				Value="Executable"/>
 		</List>
-		<Libs PreObjects="0">
-		</Libs>
 		<Includes>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="/usr/include/"/>
+			<Include Dir="/usr/include/c++/4.2.1/"/>
 		</Includes>
 	</Config>
 	<Config
@@ -115,8 +109,8 @@
 		Type="gnuc"
 		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Default Compiler">
+		OutputFile="%bdPosixInterface"
+		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -126,8 +120,7 @@
 				Deletable="0"
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
-				RunFromDir="%rw"
-				ClearProcessBuffer="1">
+				RunFromDir="%rw">
 				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
@@ -144,24 +137,22 @@
 			<Target
 				Name="Build"
 				MenuCaption="&amp;Build"
+				Dialog="_gnuc_options_form Compile"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw"
-				Dialog="_gnuc_options_form Compile"
-				ClearProcessBuffer="1">
-				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
 			</Target>
 			<Target
 				Name="Rebuild"
 				MenuCaption="&amp;Rebuild"
+				Dialog="_gnuc_options_form Compile"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw"
-				Dialog="_gnuc_options_form Compile"
-				ClearProcessBuffer="1">
-				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
+				RunFromDir="%rw">
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
 			</Target>
 			<Target
 				Name="Debug"
@@ -207,11 +198,9 @@
 				Name="LinkerOutputType"
 				Value="Executable"/>
 		</List>
-		<Libs PreObjects="0">
-		</Libs>
 		<Includes>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="/usr/include/"/>
+			<Include Dir="/usr/include/c++/4.2.1/"/>
 		</Includes>
 	</Config>
 	<Files>
@@ -220,74 +209,26 @@
 			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm">
 			<F
 				N="*.c"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.c"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.c"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.c++"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.c++"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.c++"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.cc"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cc"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cc"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.cp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cp"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.cpp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cpp"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.cxx"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cxx"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cxx"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>
@@ -296,50 +237,18 @@
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
 			<F
 				N="*.h"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.h"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.h"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.hh"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hh"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hh"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.hpp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hpp"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.hxx"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hxx"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hxx"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>
@@ -354,41 +263,15 @@
 			Filters="">
 			<F
 				N="*.inl"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.inl"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.inl"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.mak"
 				Type="Makefile"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.mak"
-				Type="Makefile"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.mak"
-				Type="Makefile"
 				Recurse="1"
 				Excludes=""/>
 			<F
 				N="*.xpm"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.xpm"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.xpm"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>

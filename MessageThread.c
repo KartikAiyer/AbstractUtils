@@ -32,7 +32,7 @@
 typedef struct _MessageThread
 {
   const char *threadName;
-  KThreadHandle threadHandle;
+  KThread threadHandle;
   void* pPrivateData;
   bool keepRunning;
   MessageThreadInit fnInit;
@@ -90,9 +90,14 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
                     pThreadParams->messageBackingStore, 
                     pThreadParams->messageSize * pThreadParams->messageQDepth, 
                     pThreadParams->messageQDepth, pThreadParams->pAdditionalOverhead ) ) {
-
-          pThread->threadHandle = KThreadCreate( Thread, pThread, pThreadParams->stackSize, pThreadParams->priority );
-          if ( pThread->threadHandle ) {
+          KTHREAD_CREATE_PARAMS( messageThread, 
+                                 pThreadParams->threadName, 
+                                 Thread, 
+                                 pThread, 
+                                 pThreadParams->stackSize, 
+                                 pThreadParams->priority );
+           
+          if ( KThreadCreate( &pThread->threadHandle, KTHREAD_PARAMS( messageThread ) ) ) {
             //Will block till initialization of thread is complete. 
             KSemaGet( pThread->semaId, WAIT_FOREVER );
             KSemaDelete( pThread->semaId );

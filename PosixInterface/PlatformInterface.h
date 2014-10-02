@@ -21,38 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __THREAD_INTERFACE_H__
-#define __THREAD_INTERFACE_H__
+#ifndef __PLATFORM_INTERFACE_H__
+#define __PLATFORM_INTERFACE_H__
 
-#include <InterfacePrivateCommon.h>
-#include <PlatformInterface.h>
+#include <pthread.h>
 
-extern const uint32_t KThreadHandleSize;
+typedef void ( *KThreadCallback )( void* arg );
 
-typedef struct _KThreadCreateParams
+typedef struct _KThread
 {
+  pthread_t pthread;
   KThreadCallback fn;
-  const char* pThreadName;
-  void* threadArg;
-  uint32_t stackSizeInBytes;
-  uint32_t threadPriority; 
-}KThreadCreateParams;
+  void* arg;
+}KThread;
 
-#define KTHREAD_CREATE_PARAMS( varName, pName, f, arg, stkSize, priority )\
-const KThreadCreateParams kthreadParams_##varName = \
-{\
-  .pThreadName = pName,\
-  .fn = f,\
-  .threadArg = arg,\
-  .stackSizeInBytes = stkSize,\
-  .threadPriority = priority\
-}
-
-#define KTHREAD_PARAMS( varName ) &kthreadParams_##varName
-
-bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams ); 
-bool KThreadDelete( KThread* pThread );
-bool KThreadJoin( KThread* pThread );
-
-#endif
-
+#endif // __PLATFORM_INTERFACE_H__
