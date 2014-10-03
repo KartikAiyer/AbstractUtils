@@ -46,8 +46,8 @@ bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBuffer
       for ( i = 0; i < CEIL_DIV( numUnits, CHAR_BIT * sizeof( uint32_t ) ); i++ ) {
         *( pFreeBits + i ) = (uint32_t)-1;
       }
-      pPool->mutex = KMutexCreate( "PoolMutex" );
-      if ( pPool->mutex ) {
+      
+      if ( KMutexCreate( &pPool->mutex, "PoolMutex" ) ) {
         retval = true;
       }
       else {
@@ -67,8 +67,7 @@ void PoolRelease( MemPool* pPool )
   if ( pPool ) {
     bool result = KMutexLock( &pPool->mutex, WAIT_FOREVER );
     if ( result ) {
-      KMutexDelete( pPool->mutex );
-      pPool->mutex = 0;
+      KMutexDelete( &pPool->mutex );
       memset( pPool->pBackingStore, 0, pPool->backingBufferSize );
       pPool->pBackingStore = 0;
       pPool->pFreeBits = 0;
@@ -119,14 +118,14 @@ void* PoolAlloc( MemPool* pPool )
 {
   void* retval = 0;
   if ( pPool ) {
-    if ( KMutexLock( pPool->mutex, WAIT_FOREVER ) ) {
+    if ( KMutexLock( &pPool->mutex, WAIT_FOREVER ) ) {
       uint32_t freeIndex = GetFreeIndex( pPool, 0 );
       if ( freeIndex < pPool->numOfUnits ) {
         uint32_t sizeofUnit = pPool->backingBufferSize / pPool->numOfUnits;
         retval = ( ( uint8_t* )pPool->pBackingStore + ( sizeofUnit * freeIndex ) );
         LOG( "%s(): Retval: %p ( index: %d )", __FUNCTION__, retval, freeIndex );
       }
-      KMutexUnlock( pPool->mutex );
+      KMutexUnlock( &pPool->mutex );
     }
     else
     {

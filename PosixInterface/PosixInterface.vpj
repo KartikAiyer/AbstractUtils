@@ -42,7 +42,8 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				DependsRef="Debug">
 				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
 			</Target>
 			<Target
@@ -52,7 +53,8 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				DependsRef="Debug">
 				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
 			</Target>
 			<Target
@@ -102,6 +104,8 @@
 		<Includes>
 			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
 		</Includes>
 	</Config>
 	<Config
@@ -141,7 +145,8 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				DependsRef="Release">
 				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t build'/>
 			</Target>
 			<Target
@@ -151,7 +156,8 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="%rw"
+				DependsRef="Release">
 				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" "%w" "%r" -t rebuild'/>
 			</Target>
 			<Target
@@ -201,6 +207,8 @@
 		<Includes>
 			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
 		</Includes>
 	</Config>
 	<Files>
@@ -208,27 +216,27 @@
 			Name="Source Files"
 			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm">
 			<F
-				N="*.c"
+				N="../*.c"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.c++"
+				N="../*.c++"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.cc"
+				N="../*.cc"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.cp"
+				N="../*.cp"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.cpp"
+				N="../*.cpp"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.cxx"
+				N="../*.cxx"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>
@@ -236,19 +244,19 @@
 			Name="Header Files"
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
 			<F
-				N="*.h"
+				N="../*.h"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.hh"
+				N="../*.hh"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.hpp"
+				N="../*.hpp"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.hxx"
+				N="../*.hxx"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>
@@ -262,16 +270,16 @@
 			Name="Other Files"
 			Filters="">
 			<F
-				N="*.inl"
+				N="../*.inl"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.mak"
+				N="../*.mak"
 				Type="Makefile"
 				Recurse="1"
 				Excludes=""/>
 			<F
-				N="*.xpm"
+				N="../*.xpm"
 				Recurse="1"
 				Excludes=""/>
 		</Folder>

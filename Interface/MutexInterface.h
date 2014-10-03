@@ -25,12 +25,11 @@
 #define __MUTEX_INTERFACE_H__
 
 #include <InterfacePrivateCommon.h>
+#include <PlatformInterface.h>
 
-typedef void* KMutexHandle;
-
-KMutexHandle KMutexCreate( const char* pMutexName );
-bool KMutexDelete( KMutexHandle hMutex );
-bool KMutexLock( KMutexHandle hMutex, uint32_t timeout );
-KMutexHandle KMutexUnlock( KMutexHandle hMutex ); 
+bool  KMutexCreate( KMutex* pMutex, const char* pMutexName );
+void KMutexDelete( KMutex* pMutex );
+bool KMutexLock( KMutex* pMutex, uint32_t timeout );
+void KMutexUnlock( KMutex* pMutex ); 
 
 #endif // __MUTEX_INTERFACE_H__

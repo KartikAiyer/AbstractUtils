@@ -21,22 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __PLATFORM_INTERFACE_H__
-#define __PLATFORM_INTERFACE_H__
 
-#include <pthread.h>
-#include <semaphore.h>
+#include "MessageQueue.h"
 
-typedef void ( *KThreadCallback )( void* arg );
 
-typedef struct _KThread
-{
-  pthread_t pthread;
-  KThreadCallback fn;
-  void* arg;
-}KThread;
-
-typedef pthread_mutex_t KMutex;
-typedef sem_t KSema;
-
-#endif // __PLATFORM_INTERFACE_H__

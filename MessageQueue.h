@@ -25,13 +25,18 @@
 #define __MESSAGE_QUEUE_H__
 
 #include "MutexInterface.h"
-#include "klist.h"
 
 typedef struct _MessageQueue
 {
-  KMutexHandle mutex;
-  KQueue queue;
+  KMutex mutex;
+  void** arrayQueueOfItems;
 }MessageQueue;
+
+#define MESSAGE_QUEUE_DEF( name, maxSize )  \
+  void* msgQueueDataStore_##name[ maxSize ];\
+  MessageQueue msgQueue_##name = { .arrayQueueOfItems = msgQueueDataStore_##name };
+
+#define MESSAGE_QUEUE( name ) msgQueue_##name;
 
 bool MessageQueueInitialize( MessageQueue* pQueue );
 void MessageQueueDeInitialize( MessageQueue* pQueue );

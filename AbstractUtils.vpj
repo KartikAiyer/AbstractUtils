@@ -12,7 +12,8 @@
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Default Compiler">
+		CompilerConfigName="Default Compiler"
+		Defines="">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -24,7 +25,7 @@
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw"
 				ClearProcessBuffer="1">
-				<Exec CmdLine='g++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
+				<Exec CmdLine='g++ -c %xup %defd -g -o "%bd%n%oe" %i %f'/>
 			</Target>
 			<Target
 				Name="Link"
@@ -35,7 +36,7 @@
 				Deletable="0"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='g++ %xup -g -o "%o" %f %libs'/>
+				<Exec CmdLine='ar -rs %xup "%o" %f'/>
 			</Target>
 			<Target
 				Name="Build"
@@ -101,7 +102,7 @@
 		<List Name="GNUC Options">
 			<Item
 				Name="LinkerOutputType"
-				Value="Executable"/>
+				Value="StaticLibrary"/>
 		</List>
 		<Libs PreObjects="0">
 		</Libs>
@@ -116,7 +117,8 @@
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdAbstractUtils"
-		CompilerConfigName="Default Compiler">
+		CompilerConfigName="Default Compiler"
+		Defines="">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -128,7 +130,7 @@
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw"
 				ClearProcessBuffer="1">
-				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
+				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i %f'/>
 			</Target>
 			<Target
 				Name="Link"
@@ -139,7 +141,7 @@
 				Deletable="0"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='g++ %xup -o "%o" %f %libs'/>
+				<Exec CmdLine='ar -rs %xup "%o" %f'/>
 			</Target>
 			<Target
 				Name="Build"
@@ -205,7 +207,7 @@
 		<List Name="GNUC Options">
 			<Item
 				Name="LinkerOutputType"
-				Value="Executable"/>
+				Value="StaticLibrary"/>
 		</List>
 		<Libs PreObjects="0">
 		</Libs>

@@ -40,7 +40,7 @@ typedef struct _MessageThread
   MemPool pool;
   MessageQueue messageQ;
   uint32_t messageSize;
-  KSemaHandle semaId; 
+  KSema sema; 
 }MessageThread;
 
 typedef struct _MessageThreadPool
@@ -74,8 +74,8 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
   pThread = ( MessageThread* )PoolAlloc( &s_threadPool.threadPool );
   if ( pThread ) {
 
-    pThread->semaId = KSemaCreate( pThreadParams->threadName, 0 );
-    if ( pThread->semaId ) {
+    
+    if ( KSemaCreate( &pThread->sema, pThreadParams->threadName, 0 ) ) {
       pThread->threadName = pThreadParams->threadName;
       pThread->messageSize = pThreadParams->messageSize;
       pThread->fnInit = pThreadParams->fnInit;
@@ -99,29 +99,28 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
            
           if ( KThreadCreate( &pThread->threadHandle, KTHREAD_PARAMS( messageThread ) ) ) {
             //Will block till initialization of thread is complete. 
-            KSemaGet( pThread->semaId, WAIT_FOREVER );
-            KSemaDelete( pThread->semaId );
-            pThread->semaId = 0;
+            KSemaGet( &pThread->sema, WAIT_FOREVER );
+            KSemaDelete( &pThread->sema );
             retval = ( MessageThreadHandle )pThread;
           }
           else {
             MSG_POOL_LOG( "%s(): Couldn't create Thread", __FUNCTION__ );
             PoolRelease( &pThread->pool );
             MessageQueueDeInitialize( &pThread->messageQ );
-            KSemaDelete( pThread->semaId );
+            KSemaDelete( &pThread->sema );
             PoolFree( &s_threadPool.threadPool, pThread );
           }
         }
         else {
           MSG_POOL_LOG( "%s(): Cannot Create Pool", __FUNCTION__ );
           MessageQueueDeInitialize( &pThread->messageQ );
-          KSemaDelete( pThread->semaId );
+          KSemaDelete( &pThread->sema );
           PoolFree( &s_threadPool.threadPool, pThread );
         }
       }
       else {
         MSG_POOL_LOG( "%s(): Cannot Create Message Queue", __FUNCTION__ );
-        KSemaDelete( pThread->semaId );
+        KSemaDelete( &pThread->sema );
         PoolFree( &s_threadPool.threadPool, pThread );
       }
     }
@@ -182,8 +181,7 @@ static void Thread( void *arg )
   assert( pThread );
   //Call private Init
   pThread->fnInit( arg );
-  assert( pThread->semaId );
-  KSemaPut( pThread->semaId );
+  KSemaPut( &pThread->sema );
   while( pThread->keepRunning ) {
     void* pMsg = MessageQueueDeQueue( &pThread->messageQ );
     if( pMsg ){

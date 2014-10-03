@@ -39,7 +39,7 @@ typedef struct _MemPool
   uint32_t* pFreeBits;
   uint32_t backingBufferSize;
   uint32_t numOfUnits;
-  KMutexHandle mutex;
+  KMutex mutex;
 }MemPool;
 
 #define CEIL_DIV( a, b )    ( (a) % (b) ) ? ( ( (a) / (b) ) + 1 ) : ( (a) / (b) )

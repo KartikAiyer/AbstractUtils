@@ -109,3 +109,7 @@ bool KThreadJoin( KThread* pThread )
   }
   return retval;
 }
+
+int main()
+{
+}

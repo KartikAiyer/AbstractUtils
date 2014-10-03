@@ -25,12 +25,11 @@
 #define __SEMAPHORE_INTERFACE_H__
 
 #include <InterfacePrivateCommon.h>
+#include <PlatformInterface.h>
 
-typedef void* KSemaHandle;
-
-KSemaHandle KSemaCreate( const char* pSemaName, uint32_t initalVal );
-bool KSemaDelete( KSemaHandle hSema );
-bool KSemaGet( KSemaHandle hSema, uint32_t timeout );
-bool KSemaPut( KSemaHandle hSema );
+bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initalVal );
+void KSemaDelete( KSema* pSema );
+bool KSemaGet( KSema* pSema, uint32_t timeout );
+void KSemaPut( KSema* pSema );
 
 #endif // __SEMAPHORE_INTERFACE_H__
