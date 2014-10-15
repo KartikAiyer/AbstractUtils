@@ -21,14 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __MESSAGE_QUEUE_H__
-#define __MESSAGE_QUEUE_H__
+#ifndef __MESSAGE_THREAD_IMPL_H__
+#define __MESSAGE_THREAD_IMPL_H__
 
-#include "MessageQueueImpl.h"
+#include "MessageQueue.h"
 
-bool MessageQueueInitialize( MessageQueue* pQueue, void** pQueueStore, uint32_t queueSize );
-void MessageQueueDeInitialize( MessageQueue* pQueue );
-bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem );
-void* MessageQueueDeQueue( MessageQueue* pQueue );
+/**
+ * Clients using the message thread should provide additional 
+ * storage space needed for maintaining the message Queue. The 
+ * amount of storage is proportional to the depth of the queue. 
+ * This macro provides a compile time method of determining the 
+ * amount of overhead and can be used to create the necessary 
+ * static storage. The storage requirements are as follows, the 
+ * actual events that will be allocated and posted, the list of 
+ * pointers to the posted events and a Pool Allocation Flag 
+ * which is used by the message pool to keep track of free 
+ * messages. 
+ */
+#define MESSAGE_THREAD_BACKING_STORE_SIZE( msgCount, msgType )\
+  ( ( ( msgCount ) * sizeof( ( msgType ) ) ) +\
+  ( ADDITIONAL_POOL_OVERHEAD_IN_ULONG( ( msgCount ) ) * sizeof( uint32_t ) ) + MESSAGE_QUEUE_STORE_OVERHEAD( ( msgCount ) ) )
 
-#endif // __MESSAGE_QUEUE_H__
+#endif // __MESSAGE_THREAD_IMPL_H__

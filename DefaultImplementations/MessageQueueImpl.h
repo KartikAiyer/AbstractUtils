@@ -21,7 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef __MESSAGE_QUEUE_IMPL_H__
+#define __MESSAGE_QUEUE_IMPL_H__
 
-#include "MessageQueue.h"
+#include "MutexInterface.h"
+#include "SemaphoreInterface.h"
+#include "Logable.h"
 
+typedef struct _MessageQueue
+{
+  KMutex mutex;
+  KSema fullSema;
+  KSema emptySema;
+  void** arrayQueueOfItems;
+  uint32_t head, tail, size;
+  bool isInitialized;
+}MessageQueue;
 
+#define MESSAGE_QUEUE_STORE_OVERHEAD( queueSize ) ( sizeof( void* ) * ( queueSize ) )
+#define MESSAGE_QUEUE_DEF( name, maxSize )  \
+  void* msgQueueDataStore_##name[ maxSize ];\
+  MessageQueue msgQueue_##name
+
+#define MESSAGE_QUEUE( name ) msgQueue_##name
+#define MESSAGE_QUEUE_STORE( name ) msgQueueDataStore_##name
+#endif //  __MESSAGE_QUEUE_IMPL_H__

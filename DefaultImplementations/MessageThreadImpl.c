@@ -41,6 +41,7 @@ typedef struct _MessageThread
   MessageQueue messageQ;
   uint32_t messageSize;
   KSema sema; 
+  Logable log;
 }MessageThread;
 
 typedef struct _MessageThreadPool
@@ -54,6 +55,7 @@ typedef struct _MessageThreadPool
 static MessageThreadPool s_threadPool = { .log = { .prefix = "MsgThrPool", .enabled = true } };
 
 #define MSG_POOL_LOG( str, ... )      Log( &s_threadPool.log, str, ##__VA_ARGS__ )
+#define MT_LOG( str, ... )  Log( &pThread->log, str, ##__VA_ARGS__ )
 
 static void Thread( void *arg );
 
@@ -73,23 +75,28 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
   //TODO: These two lines should be atomic
   pThread = ( MessageThread* )PoolAlloc( &s_threadPool.threadPool );
   if ( pThread ) {
-
-    
     if ( KSemaCreate( &pThread->sema, pThreadParams->threadName, 0 ) ) {
+      uint32_t* pPoolFlags = 0;
+      void** pMessageQArray = 0;
       pThread->threadName = pThreadParams->threadName;
       pThread->messageSize = pThreadParams->messageSize;
       pThread->fnInit = pThreadParams->fnInit;
       pThread->fnProcess = pThreadParams->fnProcess;
       pThread->pPrivateData = pThreadParams->pPrivateData;
       pThread->keepRunning = true;
+      pThread->log.prefix = pThread->threadName;
+      pThread->log.enabled = true;
       assert( pThread->fnInit && pThread->fnProcess );
 
-      if( MessageQueueInitialize( &pThread->messageQ ) )
+      pPoolFlags = ( uint32_t* )( pThreadParams->messageBackingStore + 
+                                  ( pThreadParams->messageQDepth * pThreadParams->messageSize ) );
+      pMessageQArray = ( void** )( pPoolFlags + ADDITIONAL_POOL_OVERHEAD_IN_ULONG( pThreadParams->messageQDepth ) );
+      if( MessageQueueInitialize( &pThread->messageQ, pMessageQArray, pThreadParams->messageQDepth ) )
       {
         if( PoolCreate( &pThread->pool, 
                     pThreadParams->messageBackingStore, 
                     pThreadParams->messageSize * pThreadParams->messageQDepth, 
-                    pThreadParams->messageQDepth, pThreadParams->pAdditionalOverhead ) ) {
+                    pThreadParams->messageQDepth, pPoolFlags ) ) {
           KTHREAD_CREATE_PARAMS( messageThread, 
                                  pThreadParams->threadName, 
                                  Thread, 
@@ -135,6 +142,17 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
   return retval;
 }
 
+void MessageThreadDestroy( MessageThreadHandle hThread )
+{
+  MessageThread *pThread = ( MessageThread * ) hThread;
+  if ( pThread && pThread->keepRunning ) {
+    if( !MessageThreadPost( hThread, &pThread->keepRunning ) ) { //This message will instruct the thread loop to die.
+      MT_LOG( "%s(): Unable to post Thread DIE message to thread", __FUNCTION__ );
+      assert( 0 );
+    }
+  }
+}
+
 void* MessageThreadGetPrivateData( MessageThreadHandle hThread ) 
 {
   MessageThread *pThread = ( MessageThread * )hThread;
@@ -175,6 +193,21 @@ bool MessageThreadPost( MessageThreadHandle hThread, MessageHandle hMessage )
   return retval;
 }
 
+static void MessageThreadInternalDestroy( MessageThread* pThread )
+{
+  if ( pThread ) {
+    if( KThreadDelete( &pThread->threadHandle ) ) {
+      PoolRelease( &pThread->pool );
+      MessageQueueDeInitialize( &pThread->messageQ );
+      PoolFree( &s_threadPool.threadPool, pThread );
+    } 
+    else {
+      MT_LOG( "%s(): Couldn't Delete Thread", __FUNCTION__ );
+      assert( 0 );
+    }
+  }
+}
+
 static void Thread( void *arg )
 {
   MessageThread *pThread = ( MessageThread* )arg;
@@ -184,14 +217,21 @@ static void Thread( void *arg )
   KSemaPut( &pThread->sema );
   while( pThread->keepRunning ) {
     void* pMsg = MessageQueueDeQueue( &pThread->messageQ );
-    if( pMsg ){
+    if( pMsg && pMsg != &pThread->keepRunning ){
       pThread->fnProcess( arg, pMsg );
       //Delete the message
       MessageThreadDestroyMessage( arg, &pMsg );
+    }
+    else if ( pMsg == &pThread->keepRunning ) {
+      //This message will allow us to kill this thread
+      pThread->keepRunning = false;
+      continue;
     }
     else{
       MSG_POOL_LOG( "Couldn't pull message of Q" );
       assert( 0 );
     }
   }
+  MT_LOG( "Exiting" );
+  MessageThreadInternalDestroy( pThread );
 }

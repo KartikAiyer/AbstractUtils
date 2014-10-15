@@ -104,8 +104,10 @@
 		<Includes>
 			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/"/>
 			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
 			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/DefaultImplementations/"/>
 		</Includes>
 	</Config>
 	<Config
@@ -207,8 +209,10 @@
 		<Includes>
 			<Include Dir="/usr/include/"/>
 			<Include Dir="/usr/include/c++/4.2.1/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/"/>
 			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
 			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="/Users/kartik/Project/AbstractUtils/DefaultImplementations/"/>
 		</Includes>
 	</Config>
 	<Files>
