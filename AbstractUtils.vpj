@@ -107,8 +107,10 @@
 		<Libs PreObjects="0">
 		</Libs>
 		<Includes>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="%wp/Interface"/>
+			<Include Dir="%wp/PosixInterface"/>
+			<Include Dir="%wp/DefaultImplementations"/>
+			<Include Dir="%wp"/>
 		</Includes>
 	</Config>
 	<Config
@@ -212,138 +214,43 @@
 		<Libs PreObjects="0">
 		</Libs>
 		<Includes>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/Interface/"/>
-			<Include Dir="/Users/kartik/Project/AbstractUtils/PosixInterface/"/>
+			<Include Dir="%wp/Interface"/>
+			<Include Dir="%wp/PosixInterface"/>
+			<Include Dir="%wp/DefaultImplementations"/>
+			<Include Dir="%wp"/>
 		</Includes>
 	</Config>
 	<Files>
 		<Folder
 			Name="Source Files"
 			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm">
-			<F
-				N="*.c"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.c"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.c"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.c++"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.c++"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.c++"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.cc"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cc"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cc"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.cp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.cpp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.cxx"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.cxx"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.cxx"
-				Recurse="1"
-				Excludes=""/>
+			<F N="klist.c"/>
+			<F N="Interface/Logable.c"/>
+			<F N="DefaultImplementations/MessageQueueImpl.c"/>
+			<F N="DefaultImplementations/MessageThreadImpl.c"/>
+			<F N="PosixInterface/MutexInterface.c"/>
+			<F N="Pool.c"/>
+			<F N="PosixInterface/SemaphoreInterface.c"/>
+			<F N="StateMachine.c"/>
+			<F N="PosixInterface/ThreadInterface.c"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
-			<F
-				N="*.h"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.h"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.h"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.hh"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hh"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hh"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.hpp"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hpp"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.hxx"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.hxx"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.hxx"
-				Recurse="1"
-				Excludes=""/>
+			<F N="Interface/InterfacePrivateCommon.h"/>
+			<F N="klist.h"/>
+			<F N="Interface/Logable.h"/>
+			<F N="MessageQueue.h"/>
+			<F N="DefaultImplementations/MessageQueueImpl.h"/>
+			<F N="MessageThread.h"/>
+			<F N="DefaultImplementations/MessageThreadImpl.h"/>
+			<F N="Interface/MutexInterface.h"/>
+			<F N="PosixInterface/PlatformInterface.h"/>
+			<F N="Pool.h"/>
+			<F N="Interface/SemaphoreInterface.h"/>
+			<F N="State.h"/>
+			<F N="StateMachine.h"/>
+			<F N="Interface/ThreadInterface.h"/>
 		</Folder>
 		<Folder
 			Name="Resource Files"
@@ -354,45 +261,6 @@
 		<Folder
 			Name="Other Files"
 			Filters="">
-			<F
-				N="*.inl"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.inl"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.inl"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.mak"
-				Type="Makefile"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.mak"
-				Type="Makefile"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.mak"
-				Type="Makefile"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="*.xpm"
-				Recurse="0"
-				Excludes=""/>
-			<F
-				N="Interface/*.xpm"
-				Recurse="1"
-				Excludes=""/>
-			<F
-				N="synch/*.xpm"
-				Recurse="1"
-				Excludes=""/>
 		</Folder>
 	</Files>
 </Project>

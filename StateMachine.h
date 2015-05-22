@@ -10,6 +10,10 @@
 #define __STATE_MACHINE_H__
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "State.h"
 /** Maximum number of states that a state machine can have. */
 #define STATE_MAC_MAX_STATES        20
@@ -148,5 +152,9 @@ void StateMachineStop( StateMachine* pStateMac );
  *                 machine.
  */
 void StateMachineTransition( StateMachine *pStateMac );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __STATE_MACHINE_H__

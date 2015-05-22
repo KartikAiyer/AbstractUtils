@@ -12,6 +12,10 @@
 #include <stdbool.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SM_LOG(str, ...)          (Log( (&pStateMac->logger), str, ##__VA_ARGS__))
 #define SM_DEFAULT_LOGGING          (true)
 
@@ -132,3 +136,7 @@ void StateMachineTransition( StateMachine* pStateMac )
     }
   }
 }
+
+#ifdef __cplusplus
+}
+#endif

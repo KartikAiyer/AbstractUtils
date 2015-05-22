@@ -27,6 +27,10 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void ( *KThreadCallback )( void* arg );
 
 typedef struct _KThread
@@ -36,7 +40,13 @@ typedef struct _KThread
   void* arg;
 }KThread;
 
-typedef pthread_mutex_t KMutex;
-typedef sem_t KSema;
+typedef struct _KSema {
+  sem_t *pNamedSema;
+}KSema;
 
+typedef pthread_mutex_t KMutex;
+
+#ifdef __cplusplus
+}
+#endif
 #endif // __PLATFORM_INTERFACE_H__

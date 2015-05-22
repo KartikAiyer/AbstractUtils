@@ -9,6 +9,10 @@
 
 #include "klist.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 void KQueueInit( KQueue* pQueue )
 {
   if ( pQueue ) {
@@ -50,3 +54,6 @@ KListElem* KQueueDequeue( KQueue *pQueue )
   return pRetVal;
 }
 
+#ifdef __cplusplus
+}
+#endif 

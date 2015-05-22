@@ -27,6 +27,9 @@
 #include <Logable.h>
 #include <assert.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 bool  KMutexCreate( KMutex* pMutex, const char* pMutexName )
 {
@@ -87,3 +90,6 @@ void KMutexUnlock( KMutex* pMutex )
   }
 }
 
+#ifdef __cplusplus
+}
+#endif

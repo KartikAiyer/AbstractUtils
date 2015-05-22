@@ -27,13 +27,17 @@
 #include <Logable.h>
 #include <assert.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initialVal )
 {
   bool retval = false;
   int status = 0;
   if ( pSema && initialVal < SEM_VALUE_MAX ) {
-    status = sem_init( pSema, 0, ( unsigned int ) initialVal );
-    if ( !status ) {
+    pSema->pNamedSema = sem_open( pSemaName, O_CREAT, S_IRWXU, initialVal );
+    if ( pSema->pNamedSema ) {
       retval = true;
     }
     else {
@@ -46,7 +50,7 @@ bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initialVal )
 void KSemaDelete( KSema* pSema )
 {
   if ( pSema ) {
-    int status = sem_destroy( pSema );
+    int status = sem_close( pSema->pNamedSema );
     if ( status ) {
       LOG( "%s(): Unable to destroy semaphore. RetStatus: %d", __FUNCTION__, status );
     }
@@ -67,11 +71,9 @@ bool KSemaGet( KSema* pSema, uint32_t timeout )
       }
     } else if( timeout == NO_SLEEP ) {
       int val = 0;
-      status = sem_getvalue( pSema, &val );
+      status = sem_trywait( pSema->pNamedSema );
       if ( !status ) {
-        if ( val > 0 ) {
-          retval = true;
-        }
+        retval = true;
       } else {
         LOG( "%s(): Error while trying to peek at sema value (%d)", __FUNCTION__, status );
       }
@@ -93,3 +95,6 @@ void KSemaPut( KSema* pSema )
   }
 }
 
+#ifdef __cplusplus
+}
+#endif

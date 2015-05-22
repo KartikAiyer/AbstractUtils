@@ -27,7 +27,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif 
 /** @defgroup klist - a quick linked list implementation
  *  This is a quick macro based Linked List implementation
  *  The idea heare is to represent a linked list by the head
@@ -160,4 +162,7 @@ void KQueueInsert( KQueue *pQueue, KListElem *pElem );
  */
 KListElem* KQueueDequeue( KQueue *pQueue );
 
+#ifdef __cplusplus
+}
+#endif 
 #endif //__KLIST_H__

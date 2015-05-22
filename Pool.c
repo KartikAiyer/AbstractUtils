@@ -28,6 +28,10 @@
 #include <limits.h>
 #include "Logable.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
 
 #undef LOG
@@ -156,3 +160,7 @@ void PoolFree( MemPool* pPool, void* buf )
     }
   }
 }
+
+#ifdef __cplusplus
+}
+#endif

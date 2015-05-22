@@ -26,9 +26,15 @@
 
 #include "MessageQueueImpl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 bool MessageQueueInitialize( MessageQueue* pQueue, void** pQueueStore, uint32_t queueSize );
 void MessageQueueDeInitialize( MessageQueue* pQueue );
 bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem );
 void* MessageQueueDeQueue( MessageQueue* pQueue );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __MESSAGE_QUEUE_H__

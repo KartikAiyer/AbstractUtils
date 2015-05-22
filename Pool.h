@@ -13,6 +13,9 @@
 #include <limits.h>
 #include "MutexInterface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @defgroup MemoryPools - A fixed Block mempool api.
  *  Typically we don't want to rely on malloc and free due to
@@ -106,4 +109,9 @@ void* PoolAlloc( MemPool* pPool );
  * @param buf - buffer to free. 
  */
 void PoolFree( MemPool* pPool, void* buf );
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //__POOL_H__

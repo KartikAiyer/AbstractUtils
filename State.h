@@ -15,6 +15,10 @@
 #include "Logable.h"
 #include "klist.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///Forward Declarations
 struct _State;
 
@@ -161,5 +165,8 @@ typedef struct _State
   .fnHandleEvent = handleEvent\
 }
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __STATE_H__
 

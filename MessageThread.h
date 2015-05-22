@@ -30,6 +30,9 @@
 #include "Pool.h"
 #include "MessageThreadImpl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MESSAGE_THREADS_MAX            ( 5 )
 
@@ -163,5 +166,9 @@ void MessageThreadDestroyMessage( MessageThreadHandle hThread, MessageHandle* ph
  * @return bool - True if the event has been posted.
  */
 bool MessageThreadPost( MessageThreadHandle hThread, MessageHandle hMessage );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __MESSAGE_THREAD_H__

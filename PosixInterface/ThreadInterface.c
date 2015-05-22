@@ -26,6 +26,10 @@
 #include <pthread.h>
 #include <Logable.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 const uint32_t KThreadHandleSize = sizeof( KThread );
 
 static void* Thread( void* arg )
