@@ -1,6 +1,7 @@
 .DS*
 *.vtg
 *.vpwhistu
+build
 AbstractUtils.mak
 Debug
 Release

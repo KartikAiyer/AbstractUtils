@@ -63,7 +63,7 @@ bool KSemaGet( KSema* pSema, uint32_t timeout )
   int status = 0;
   if ( pSema ) {
     if ( timeout == WAIT_FOREVER ) {
-      status = sem_wait( pSema );
+      status = sem_wait( pSema->pNamedSema );
       if ( status ) {
         LOG( "%s(): Error while waiting for semaphore (%d)", __FUNCTION__, status );
       } else {
@@ -88,7 +88,7 @@ void KSemaPut( KSema* pSema )
 {
   if ( pSema ) {
     int status = 0;
-    status = sem_post( pSema );
+    status = sem_post( pSema->pNamedSema );
     if ( status ) {
       LOG( "%s(): Unable to post semaphore (%d)", __FUNCTION__, status );
     }
