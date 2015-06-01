@@ -25,6 +25,10 @@
 #include <MessageQueue.h>
 #include <assert.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool MessageQueueInitialize( MessageQueue* pQueue, void** pQueueStore, uint32_t queueSize )
 {
   bool retval = false;
@@ -96,3 +100,6 @@ void* MessageQueueDeQueue( MessageQueue* pQueue )
   return retval;
 }
 
+#ifdef __cplusplus
+}
+#endif

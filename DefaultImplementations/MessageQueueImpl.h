@@ -28,6 +28,10 @@
 #include "SemaphoreInterface.h"
 #include "Logable.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _MessageQueue
 {
   KMutex mutex;
@@ -45,4 +49,9 @@ typedef struct _MessageQueue
 
 #define MESSAGE_QUEUE( name ) msgQueue_##name
 #define MESSAGE_QUEUE_STORE( name ) msgQueueDataStore_##name
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //  __MESSAGE_QUEUE_IMPL_H__

@@ -9,6 +9,9 @@
 #ifndef __LOGGABLE_H__
 #define __LOGGABLE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef void (*Logger)( char* str, ... );
 typedef struct _Logable
 {
@@ -19,8 +22,11 @@ typedef struct _Logable
 
 void Log( Logable *pLoggable, const char* str, ... );
 
-extern Logable g_generalLogger;  
+Logable g_generalLogger;  
 
 #define LOG( str, ... )       Log( &g_generalLogger, str, ##__VA_ARGS__ )
 
+#ifdef __cplusplus
+}
+#endif
 #endif //__LOGGABLE_H__

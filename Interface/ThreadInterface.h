@@ -27,6 +27,10 @@
 #include <InterfacePrivateCommon.h>
 #include <PlatformInterface.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const uint32_t KThreadHandleSize;
 
 typedef struct _KThreadCreateParams
@@ -54,5 +58,8 @@ bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams );
 bool KThreadDelete( KThread* pThread );
 bool KThreadJoin( KThread* pThread );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

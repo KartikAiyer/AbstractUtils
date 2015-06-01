@@ -27,9 +27,18 @@
 #include <InterfacePrivateCommon.h>
 #include <PlatformInterface.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool  KMutexCreate( KMutex* pMutex, const char* pMutexName );
 void KMutexDelete( KMutex* pMutex );
 bool KMutexLock( KMutex* pMutex, uint32_t timeout );
 void KMutexUnlock( KMutex* pMutex ); 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __MUTEX_INTERFACE_H__

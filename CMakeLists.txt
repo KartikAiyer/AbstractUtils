@@ -12,10 +12,10 @@ include_directories( ${POSIX_INTERFACE} )
 include_directories( ${UTILS} )
 
 file( GLOB DEF_SOURCES ${DEFAULT_IMPL}/*.c ${DEFAULT_IMPL}/*.h )
-file( GLOB INTERFACE_HEADERS ${INTERFACE}/*.h )
+file( GLOB INTERFACE_SOURCES ${INTERFACE}/*.h ${INTERFACE}/*.c )
 file( GLOB POSIX_SOURCES ${POSIX_INTERFACE}/*.c ${POSIX_INTERFACE}/*.h )
 file( GLOB UTIL_SOURCES ${UTILS}/*.c ${UTILS}/*.h )
 
-add_library( AbstractUtils STATIC ${INTERFACE} ${DEF_SOURCES} ${POSIX_SOURCES} ${UTIL_SOURCES} )
+add_library( AbstractUtils STATIC ${INTERFACE_SOURCES} ${POSIX_SOURCES} ${DEF_SOURCES} ${UTIL_SOURCES} )
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Tests)

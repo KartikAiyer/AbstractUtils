@@ -29,6 +29,10 @@
 #include "ThreadInterface.h"
 #include "SemaphoreInterface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _MessageThread
 {
   const char *threadName;
@@ -235,3 +239,8 @@ static void Thread( void *arg )
   MT_LOG( "Exiting" );
   MessageThreadInternalDestroy( pThread );
 }
+
+#ifdef __cplusplus
+}
+#endif
+

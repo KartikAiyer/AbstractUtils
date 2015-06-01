@@ -14,6 +14,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Logable g_generalLogger = { .prefix = 0, .enabled = true };  
 
 void Log( Logable *pLog, const char* pStr, ... )
@@ -34,4 +39,7 @@ void Log( Logable *pLog, const char* pStr, ... )
   va_end( arguments );
 }
 
+#ifdef __cplusplus
+}
+#endif
 

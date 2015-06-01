@@ -27,9 +27,17 @@
 #include <InterfacePrivateCommon.h>
 #include <PlatformInterface.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initalVal );
 void KSemaDelete( KSema* pSema );
 bool KSemaGet( KSema* pSema, uint32_t timeout );
 void KSemaPut( KSema* pSema );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __SEMAPHORE_INTERFACE_H__
