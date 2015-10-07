@@ -22,7 +22,7 @@ typedef struct _Logable
 
 void Log( Logable *pLoggable, const char* str, ... );
 
-Logable g_generalLogger;  
+extern Logable g_generalLogger;  
 
 #define LOG( str, ... )       Log( &g_generalLogger, str, ##__VA_ARGS__ )
 

@@ -38,6 +38,7 @@ typedef struct _KThread
   pthread_t pthread;
   KThreadCallback fn;
   void* arg;
+  bool isComplete;
 }KThread;
 
 typedef struct _KSema {

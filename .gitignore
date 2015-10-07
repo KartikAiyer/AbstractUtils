@@ -1,8 +1,9 @@
 .DS*
-*.vtg
-*.vpwhistu
+*.vt*
+*.vp*
 build
 AbstractUtils.mak
 Debug
 Release
+.idea
 

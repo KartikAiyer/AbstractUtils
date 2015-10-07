@@ -69,14 +69,12 @@ bool KMutexLock( KMutex* pMutex, uint32_t timeout )
 {
   bool retval = false;
   if ( pMutex ) {
-    if ( timeout == NO_SLEEP || timeout != WAIT_FOREVER ) {
-      if ( timeout == NO_SLEEP && 
-           pthread_mutex_trylock( pMutex ) == 0 ) {
-        //Acquired Lock
-        retval = true;
-      } else if( pthread_mutex_lock( pMutex ) == 0 ) {
-        retval = true;
-      }
+    if ( timeout == NO_SLEEP &&
+      pthread_mutex_trylock( pMutex ) == 0 ) {
+      //Acquired Lock
+      retval = true;
+    } else if( pthread_mutex_lock( pMutex ) == 0 ) {
+      retval = true;
     }
   }
   assert( retval == true );

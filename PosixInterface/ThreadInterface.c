@@ -23,8 +23,8 @@
  */
 
 #include <ThreadInterface.h>
-#include <pthread.h>
 #include <Logable.h>
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,9 +35,8 @@ const uint32_t KThreadHandleSize = sizeof( KThread );
 static void* Thread( void* arg )
 {
   KThread* pThread = ( KThread* )arg;
-  if ( pThread ) {
-    pThread->fn( pThread->arg );
-  }
+  pThread->fn( pThread->arg );
+  pThread->isComplete = true;
   return NULL;
 }
 
@@ -54,26 +53,21 @@ bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams )
       if ( !err ) {
         err = pthread_attr_setstacksize( &attr, pParams->stackSizeInBytes );
         if( !err ) {
-          schedParam.sched_priority = pParams->threadPriority;
-          err = pthread_attr_setschedpolicy( &attr, SCHED_RR );
+          schedParam.sched_priority = 0;
+          err = pthread_attr_setschedpolicy( &attr, SCHED_OTHER );
           if ( !err ) {
-            err = pthread_attr_setschedparam( &attr, &schedParam );
+            pthread_attr_setschedparam( &attr, &schedParam );
+            pThread->fn = pParams->fn;
+            pThread->arg = pParams->threadArg;
+            pThread->isComplete = false;
+            err = pthread_create( &pThread->pthread, &attr, Thread, pThread );
             if ( !err ) {
-              pThread->fn = pParams->fn;
-              pThread->arg = pParams->threadArg;
-              err = pthread_create( &pThread->pthread, &attr, Thread, pThread );
-              if ( !err ) {
-                retval  = true;
-              } else {
-                LOG( "%s(): Unable to create thread. Err: %d", __FUNCTION__, err );
-              }
-            }
-            else {
-              LOG( "%s(): Unable to set Scheduling Parameter with priority %d. Err: %d", 
-                   __FUNCTION__, schedParam.sched_priority, err );
+              retval  = true;
+            } else {
+              LOG( "%s(): Unable to create thread. Err: %d", __FUNCTION__, err );
             }
           } else {
-            LOG( "%s(): Unable to set Pthread Scheduling to RR: %d", __FUNCTION__, err );
+            LOG( "%s(): Unable to set Pthread Scheduling to OTHER: %d", __FUNCTION__, err );
           }
         } else {
           LOG( "%s(): Unable to set stack size to: %d, err: %d",
@@ -94,7 +88,7 @@ bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams )
 }
 
 //TODO: Not sure if this implementation is correct. What does is mean to delete the Thread
-//Does Joining the thread make sure that the thread is deleted? Need to check with the Pthread API
+//Does Joining the thread make sure that the thread is deleted? 
 bool KThreadDelete( KThread* pThread )
 {
   return KThreadJoin( pThread );
@@ -102,18 +96,18 @@ bool KThreadDelete( KThread* pThread )
 
 bool KThreadJoin( KThread* pThread )
 {
-  bool retval = false;
+  bool retval = true;
   int err = 0;
-  err = pthread_join( pThread->pthread, NULL );
-  if ( !err ) {
-    retval = true;
-  }
-  else{ 
-    LOG( "%s(): Was not able to wait for thread to join. Err: %d", __FUNCTION__, err );
-  }
+  if ( pThread && !pThread->isComplete ) {
+    err = pthread_join( pThread->pthread, NULL );
+    if ( err ) {
+      LOG( "%s(): Was not able to wait for thread to join. Err: %d", __FUNCTION__, err );
+      retval = false;
+    }
+  } 
   return retval;
 }
 
-int main()
-{
+#ifdef __cplusplus
 }
+#endif
