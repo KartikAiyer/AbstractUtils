@@ -83,7 +83,8 @@ static void BlockableQueuePoster( void* arg )
 TEST_F( MsgQTest, TestBlockableQueue )
 {
   SetupQueue( BlockableQueuePoster, 5 );
-  for ( int32_t i = 5; i >= 0; i-- ) {
+  for ( int32_t i = 0; i < 5; i++ ) {
+    LOG( "Posting %d to queue", i );
     bool retval = MessageQueueEnQueue( &queue, (void*) i );
     ASSERT_TRUE( retval );
   }

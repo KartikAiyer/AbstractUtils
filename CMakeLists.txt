@@ -17,6 +17,8 @@ file( GLOB POSIX_SOURCES ${POSIX_INTERFACE}/*.c ${POSIX_INTERFACE}/*.h )
 file( GLOB UTIL_SOURCES ${UTILS}/*.c ${UTILS}/*.h )
 
 set( SOURCES ${INTERFACE_SOURCES} ${POSIX_SOURCES} ${DEF_SOURCES} ${UTIL_SOURCES} )
+set( CMAKE_C_FLAGS "-m32" )
+set( CMAKE_EXE_LINKER_FLAGS "-m32" )
 add_library( AbstractUtils STATIC ${SOURCES} )
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Tests)

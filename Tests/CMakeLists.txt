@@ -2,6 +2,9 @@ cmake_minimum_required( VERSION 2.6.0 )
 project( AbstractUtilTest CXX C )
 
 set( GTEST_DIR ${PROJECT_SOURCE_DIR}/gtest )
+set( CMAKE_C_FLAGS "-m32" )
+set( CMAKE_CXX_FLAGS "-m32" )
+set( CMAKE_EXE_LINKER_FLAGS "-m32" )
 
 add_subdirectory( ${GTEST_DIR} )
 include_directories( ${GTEST_DIR}/include )

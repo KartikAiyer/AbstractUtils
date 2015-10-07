@@ -93,7 +93,6 @@ TEST( KThreadTest, TestBasicPremption )
                            1024 * 8,
                            120 );
     if( KThreadCreate( &threadMid, KTHREAD_PARAMS( threadParamsMid ) ) ){
-        sleep( 1 );
         if( KThreadCreate( &threadHi, KTHREAD_PARAMS( threadParamsHi ) ) ) {
             ASSERT_TRUE( KThreadJoin( &threadMid ) );
             ASSERT_TRUE( KThreadJoin( &threadHi ) );

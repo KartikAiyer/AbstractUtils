@@ -35,7 +35,7 @@ bool MessageQueueInitialize( MessageQueue* pQueue, void** pQueueStore, uint32_t 
   if ( pQueue && pQueueStore && queueSize > 0 ) {
     if( KMutexCreate( &pQueue->mutex, "Queue Mutex" ) &&
         KSemaCreate( &pQueue->fullSema, "Queue Full Sema", queueSize ) &&
-        KSemaCreate( &pQueue->emptySema, "Queue Empyt Sema", 0 ) ) {
+        KSemaCreate( &pQueue->emptySema, "Queue Empty Sema", 0 ) ) {
       pQueue->arrayQueueOfItems = pQueueStore;
       pQueue->head = pQueue->tail = 0;
       pQueue->size = queueSize;   
@@ -61,13 +61,14 @@ void MessageQueueDeInitialize( MessageQueue* pQueue )
 bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem )
 {
   bool retval = false;
-  if ( pQueue && pQueue->isInitialized && pItem ) {
+  if ( pQueue && pQueue->isInitialized ) {
     if( KSemaGet ( &pQueue->fullSema, WAIT_FOREVER ) ) {
       if ( KMutexLock( &pQueue->mutex, WAIT_FOREVER ) ) {
         KSemaPut( &pQueue->emptySema );
         pQueue->arrayQueueOfItems[ pQueue->head ] = pItem;
         pQueue->head = ( pQueue->head + 1 ) % pQueue->size;
         KMutexUnlock( &pQueue->mutex );
+        retval = true;
       } else {
         LOG( "%s(): Could'n't Get Queue Mutex", __FUNCTION__ );
       }
@@ -75,6 +76,8 @@ bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem )
     else {
       LOG( "%s(): Unable to Get Full Semaphore", __FUNCTION__ );
     }
+  } else {
+    LOG( "%s(): Invalid Queue( %p ) or not init", __FUNCTION__, pQueue );
   }
   return retval;
 }

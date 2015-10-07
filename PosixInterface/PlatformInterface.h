@@ -43,6 +43,7 @@ typedef struct _KThread
 
 typedef struct _KSema {
   sem_t *pNamedSema;
+  char* pSemaphoreName;
 }KSema;
 
 typedef pthread_mutex_t KMutex;

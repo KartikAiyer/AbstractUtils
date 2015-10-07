@@ -25,6 +25,8 @@
 #include <SemaphoreInterface.h>
 #include <semaphore.h>
 #include <Logable.h>
+#include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #ifdef __cplusplus
@@ -36,8 +38,16 @@ bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initialVal )
   bool retval = false;
   int status = 0;
   if ( pSema && initialVal < SEM_VALUE_MAX ) {
-    pSema->pNamedSema = sem_open( pSemaName, O_CREAT, S_IRWXU, initialVal );
-    if ( pSema->pNamedSema ) {
+    int16_t initVal16 = initialVal;
+    size_t strLen = strlen( pSemaName );
+    pSema->pSemaphoreName = malloc( strLen + 1 );
+    if( pSema->pSemaphoreName ) {
+      strcpy( pSema->pSemaphoreName, pSemaName );
+    }
+    sem_unlink( pSemaName );
+    pSema->pNamedSema = sem_open( pSema->pSemaphoreName, O_CREAT, S_IRWXU, initVal16 );
+    LOG( "%s(): Create Semaphore with initial value: %d", __FUNCTION__, initialVal );
+    if ( pSema->pNamedSema != SEM_FAILED ) {
       retval = true;
     }
     else {
@@ -51,7 +61,11 @@ void KSemaDelete( KSema* pSema )
 {
   if ( pSema ) {
     int status = sem_close( pSema->pNamedSema );
-    if ( status ) {
+    if ( !status ) {
+      status = sem_unlink( pSema->pSemaphoreName );
+      free( pSema->pSemaphoreName );
+      pSema->pSemaphoreName = 0;
+    } else {
       LOG( "%s(): Unable to destroy semaphore. RetStatus: %d", __FUNCTION__, status );
     }
   }
