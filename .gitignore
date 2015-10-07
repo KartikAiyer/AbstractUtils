@@ -1,7 +1,7 @@
 .DS*
 *.vt*
 *.vp*
-build
+build*
 AbstractUtils.mak
 Debug
 Release

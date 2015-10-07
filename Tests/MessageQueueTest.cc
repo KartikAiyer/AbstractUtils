@@ -48,7 +48,7 @@ public:
     }
     KThreadCreate( &thr, KTHREAD_PARAMS( thrPar ) );
   }
-protected:
+public:
   virtual void SetUp()
   {
   }
@@ -65,15 +65,17 @@ protected:
   MessageQueue queue;
   void** queueStore;
   void (*action)(void* arg);
+  uint32_t valCheck;
 };
 
 static void BlockableQueuePoster( void* arg )
 {
-  MessageQueue* pQueue = ( MessageQueue* )arg;
-  if ( pQueue ) {
-    uint64_t val = 0;
+  MsgQTest* pTest= ( MsgQTest* )arg;
+  if ( pTest ) {
+    uint32_t val = 0;
     do {
-      val = ( uint64_t )MessageQueueDeQueue( pQueue );
+      val = ( uint32_t )MessageQueueDeQueue( &pTest->queue );
+      ASSERT_TRUE( val == pTest->valCheck-- );
       usleep( 50000 );
     }while( val != 0 );
   }
@@ -82,21 +84,19 @@ static void BlockableQueuePoster( void* arg )
 TEST_F( MsgQTest, TestBlockableQueue )
 {
   SetupQueue( BlockableQueuePoster, 5 );
-  for ( int32_t i = 0; i < 5; i++ ) {
+  valCheck = 5;
+  for ( int32_t i = 5; i >= 0; i-- ) {
     bool retval = MessageQueueEnQueue( &queue, (void*) i );
     ASSERT_TRUE( retval );
   }
 }
 
-TEST_F( MsgQTest, TestQueueingOrderIsCorrect )
+TEST_F( MsgQTest, TestQueueCanBlockAndSend)
 {
-  SetupQueue( BlockableQueuePoster, 5 );
-  for( uint32_t i = 0; i < 5; i++ ) {
+  SetupQueue( BlockableQueuePoster, 1 );
+  valCheck = 5;
+  for( int32_t i = 5; i >= 0; i-- ) {
     bool retval = MessageQueueEnQueue( &queue, (void*) i );
     ASSERT_TRUE( retval );
-  }
-  for( uint32_t i = 0; i < 5; i++ ) {
-    uint32_t val = ( uint32_t ) MessageQueueDeQueue( &queue );
-    ASSERT_TRUE( val == i );
   }
 }
