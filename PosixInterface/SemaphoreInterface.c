@@ -46,7 +46,6 @@ bool KSemaCreate( KSema* pSema, const char* pSemaName, uint32_t initialVal )
     }
     sem_unlink( pSemaName );
     pSema->pNamedSema = sem_open( pSema->pSemaphoreName, O_CREAT, S_IRWXU, initVal16 );
-    LOG( "%s(): Create Semaphore with initial value: %d", __FUNCTION__, initialVal );
     if ( pSema->pNamedSema != SEM_FAILED ) {
       retval = true;
     }

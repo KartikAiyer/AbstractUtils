@@ -47,7 +47,6 @@ public:
       ASSERT_TRUE( false );
     }
     KThreadCreate( &thr, KTHREAD_PARAMS( thrPar ) );
-    std::cout << "Everything is ready\n";
   }
 protected:
   virtual void SetUp()
@@ -84,8 +83,20 @@ TEST_F( MsgQTest, TestBlockableQueue )
 {
   SetupQueue( BlockableQueuePoster, 5 );
   for ( int32_t i = 0; i < 5; i++ ) {
-    LOG( "Posting %d to queue", i );
     bool retval = MessageQueueEnQueue( &queue, (void*) i );
     ASSERT_TRUE( retval );
+  }
+}
+
+TEST_F( MsgQTest, TestQueueingOrderIsCorrect )
+{
+  SetupQueue( BlockableQueuePoster, 5 );
+  for( uint32_t i = 0; i < 5; i++ ) {
+    bool retval = MessageQueueEnQueue( &queue, (void*) i );
+    ASSERT_TRUE( retval );
+  }
+  for( uint32_t i = 0; i < 5; i++ ) {
+    uint32_t val = ( uint32_t ) MessageQueueDeQueue( &queue );
+    ASSERT_TRUE( val == i );
   }
 }

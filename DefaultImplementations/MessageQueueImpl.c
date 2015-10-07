@@ -89,7 +89,6 @@ void* MessageQueueDeQueue( MessageQueue* pQueue )
     if( KSemaGet( &pQueue->emptySema, WAIT_FOREVER ) ) {
       if ( KMutexLock( &pQueue->mutex, WAIT_FOREVER ) ) {
         KSemaPut( &pQueue->fullSema );
-        assert( pQueue->arrayQueueOfItems[ pQueue->tail ] );
         retval = pQueue->arrayQueueOfItems[ pQueue->tail ];
         pQueue->tail = ( pQueue->tail + 1 ) % pQueue->size;
         KMutexUnlock( &pQueue->mutex );
