@@ -25,6 +25,7 @@
 #include <gtest/gtest.h>
 #include <ThreadInterface.h>
 #include <MutexInterface.h>
+#include <SemaphoreInterface.h>
 #include <Logable.h>
 
 typedef struct _ThreadTest1Data
@@ -104,5 +105,75 @@ TEST( KThreadTest, TestBasicPremption )
   }
 }
 
+typedef struct _SemPriWakeData
+{
+  KSema *pSema;
+  uint32_t threadNum;
+  uint32_t priority;
+}SemPriWakeData;
+static uint32_t s_currentThreadPriority = 0;
+static void SemaphorePriorityWakeThread( void* arg )
+{
+  SemPriWakeData* pData = ( SemPriWakeData* )arg;
+  ASSERT_TRUE( KSemaGet( pData->pSema, WAIT_FOREVER ) );
+  ASSERT_TRUE( s_currentThreadPriority == pData->priority );
+  s_currentThreadPriority--;
+  KSemaPut( pData->pSema );
+}
 
+static void SemaphorePrioritySemUpThread( void* arg )
+{
+  KSema *pSema = ( KSema* )arg;
+  KSemaPut( pSema );
+}
+
+TEST( KTreadTest, SemaphorePriorityWake )
+{
+  //Tests that the highest-priority thread waiting
+  // on a semaphore is the first to wake up.
+  const int kNumOfThread = 10;
+  KSema sem;
+  SemPriWakeData data[ kNumOfThread ];
+  KThread threads[kNumOfThread];
+  KThread lastThread;
+  uint32_t priority = s_currentThreadPriority = 100;
+  if( KSemaCreate( &sem, "SemPriWakeTest", 0 ) ) {
+    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+      char name[20] = { 0 };
+      sprintf( name, "Thread %d", i );
+      data[ i ].priority = priority;
+      data[ i ].threadNum = i;
+      data[ i ].pSema = &sem;
+      KTHREAD_CREATE_PARAMS( threadParams,
+                             "Thread",
+                             SemaphorePriorityWakeThread,
+                             &data[ i ],
+                             1024 * 8,
+                             priority-- );
+      if( !KThreadCreate( &threads[ i ], KTHREAD_PARAMS( threadParams ) ) ) {
+        GTEST_FATAL_FAILURE_( "Couldn't create test thread" );
+        break;
+      }
+    }
+    //Create the lowest priority thread that will up the semaphore
+    KTHREAD_CREATE_PARAMS( threadLoPri,
+                            "SemUpThread",
+                            SemaphorePrioritySemUpThread,
+                            &sem,
+                            1024 * 8,
+                            --priority );
+    if( !KThreadCreate( &lastThread, KTHREAD_PARAMS( threadLoPri ) ) ) {
+      GTEST_FATAL_FAILURE_( "Couldn't create lowest priority thread" );
+    }
+    KThreadJoin( &lastThread );
+    KThreadDelete( &lastThread );
+    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+      KThreadJoin( &threads[ i ] );
+    }
+    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+      KThreadDelete( &threads[ i ] );
+    }
+    KSemaDelete( &sem );
+  }
+}
 
