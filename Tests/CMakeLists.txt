@@ -7,10 +7,16 @@ set( CMAKE_CXX_FLAGS "-m32" )
 set( CMAKE_EXE_LINKER_FLAGS "-m32" )
 
 add_subdirectory( ${GTEST_DIR} )
-add_subdirectory( ${PROJECT_SOURCE_DIR}/embUnit )
+add_subdirectory( ${PROJECT_SOURCE_DIR}/embunit )
 include_directories( ${GTEST_DIR}/include )
 
-file( GLOB TEST_SRC ${PROJECT_SOURCE_DIR}/*.cc ${PROJECT_SOURCE_DIR}/*.c )
+file( GLOB GTEST_SRC ${PROJECT_SOURCE_DIR}/gtests/*.cc ${PROJECT_SOURCE_DIR}/gtests/*.c )
 
-add_executable( tests ${TEST_SRC} )
-target_link_libraries( tests gtest AbstractUtils )
+add_executable( gtests ${GTEST_SRC} )
+target_link_libraries( gtests gtest AbstractUtils )
+
+file( GLOB EMBTEST_SRC ${PROJECT_SOURCE_DIR}/embtests/*.c ${PROJECT_SOURCE_DIR}/embtests/*.h )
+include_directories( ${PROJECT_SOURCE_DIR}/embunit/embUnit )
+include_directories( ${PROJECT_SOURCE_DIR}/embunit )
+add_executable( embtests ${EMBTEST_SRC} )
+target_link_libraries( embtests embUnit AbstractUtils )
