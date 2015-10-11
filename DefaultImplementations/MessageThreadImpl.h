@@ -40,6 +40,6 @@
  */
 #define MESSAGE_THREAD_BACKING_STORE_SIZE( msgCount, msgType )\
   ( ( ( msgCount ) * sizeof( ( msgType ) ) ) +\
-  ( ADDITIONAL_POOL_OVERHEAD_IN_ULONG( ( msgCount ) ) * sizeof( uint32_t ) ) + MESSAGE_QUEUE_STORE_OVERHEAD( ( msgCount ) ) )
+  ADDITIONAL_POOL_OVERHEAD( ( msgCount ) ) + MESSAGE_QUEUE_STORE_OVERHEAD( ( msgCount ) ) )
 
 #endif // __MESSAGE_THREAD_IMPL_H__

@@ -50,8 +50,7 @@ typedef struct _MessageThread
 
 typedef struct _MessageThreadPool
 {
-  MessageThread threads[ MESSAGE_THREADS_MAX ];
-  uint32_t poolActData[ ADDITIONAL_POOL_OVERHEAD_IN_ULONG( MESSAGE_THREADS_MAX ) ];
+  uint8_t threadStore[ POOL_STORE_SIZE( MESSAGE_THREADS_MAX, sizeof( MessageThread ) ) ];
   MemPool threadPool;
   Logable log;
 }MessageThreadPool;
@@ -65,7 +64,10 @@ static void Thread( void *arg );
 
 void MessageThreadSystemInit( void )
 {
-  if ( !PoolCreate( &s_threadPool.threadPool, (uint8_t* )s_threadPool.threads, sizeof(s_threadPool.threads ), MESSAGE_THREADS_MAX, s_threadPool.poolActData ) ) {
+  if ( !PoolCreate( &s_threadPool.threadPool,
+                    s_threadPool.threadStore,
+                    sizeof(s_threadPool.threadStore ),
+                    MESSAGE_THREADS_MAX ) ) {
     assert( 0 );
   }
 }
@@ -76,7 +78,6 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
   MessageThreadHandle retval = NULL;
   MessageThread *pThread = NULL;
 
-  //TODO: These two lines should be atomic
   pThread = ( MessageThread* )PoolAlloc( &s_threadPool.threadPool );
   if ( pThread ) {
     if ( KSemaCreate( &pThread->sema, pThreadParams->threadName, 0 ) ) {
@@ -92,15 +93,14 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
       pThread->log.enabled = true;
       assert( pThread->fnInit && pThread->fnProcess );
 
-      pPoolFlags = ( uint32_t* )( pThreadParams->messageBackingStore + 
-                                  ( pThreadParams->messageQDepth * pThreadParams->messageSize ) );
-      pMessageQArray = ( void** )( pPoolFlags + ADDITIONAL_POOL_OVERHEAD_IN_ULONG( pThreadParams->messageQDepth ) );
+      pMessageQArray = ( void** )( pThreadParams->messageBackingStore +
+                                   POOL_STORE_SIZE( pThreadParams->messageQDepth, pThread->messageSize ) );
       if( MessageQueueInitialize( &pThread->messageQ, pMessageQArray, pThreadParams->messageQDepth ) )
       {
         if( PoolCreate( &pThread->pool, 
-                    pThreadParams->messageBackingStore, 
-                    pThreadParams->messageSize * pThreadParams->messageQDepth, 
-                    pThreadParams->messageQDepth, pPoolFlags ) ) {
+                        pThreadParams->messageBackingStore,
+                        pThreadParams->messageSize * pThreadParams->messageQDepth,
+                        pThreadParams->messageQDepth ) ) {
           KTHREAD_CREATE_PARAMS( messageThread, 
                                  pThreadParams->threadName, 
                                  Thread, 

@@ -37,30 +37,38 @@ static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
 #undef LOG
 #define LOG( str, ... )   Log( &s_poolLog, str, ##__VA_ARGS__ )
 
+#define SINGLE_BITMASK_CAPACITY                 ( CHAR_BIT * sizeof( uint32_t ) )
+#define FREE_BITMASK_SIZE_IN_ULONG(numUnits)    CEIL_DIV( numUnits, SINGLE_BITMASK_CAPACITY )
 
-bool PoolCreate( MemPool* pPool, uint8_t* pBackingBuffer, uint32_t backingBufferSize, uint32_t numUnits, uint32_t* pFreeBits )
+bool PoolCreate( MemPool* pPool,
+                 uint8_t* pBackingBuffer,
+                 uint32_t backingBufferSize,
+                 uint32_t numUnits )
 {
   bool retval = false;
-  if ( pPool && pBackingBuffer && pFreeBits ) {
-    if ( backingBufferSize % numUnits == 0 ) {
-      uint32_t i = 0;
-      pPool->pBackingStore = pBackingBuffer;
-      pPool->numOfUnits = numUnits;
-      pPool->pFreeBits = pFreeBits;
-      for ( i = 0; i < CEIL_DIV( numUnits, CHAR_BIT * sizeof( uint32_t ) ); i++ ) {
-        *( pFreeBits + i ) = (uint32_t)-1;
+  if ( pPool && pBackingBuffer ) {
+    uint32_t i = 0;
+    uint32_t actualBackingBufferSize = pPool->backingBufferSize - ADDITIONAL_POOL_OVERHEAD( numUnits );
+
+    pPool->pBackingStore = pBackingBuffer;
+    pPool->backingBufferSize = backingBufferSize;
+    pPool->numOfUnits = numUnits;
+    pPool->pFreeBits = (uint32_t*) ( pBackingBuffer + actualBackingBufferSize );
+    if( actualBackingBufferSize % numUnits == 0 ) {
+      for( i = 0; i < FREE_BITMASK_SIZE_IN_ULONG( numUnits ); i++ ) {
+        *(pPool->pFreeBits + i) = ( uint32_t ) -1;
       }
-      
-      if ( KMutexCreate( &pPool->mutex, "PoolMutex" ) ) {
+
+      if( KMutexCreate( &pPool->mutex, "PoolMutex" )) {
         retval = true;
       }
       else {
         LOG( "Couldn't Initialize Mutex" );
       }
-    }
-    else
-    {
-      LOG( "Can't cleanly allocate %d units from %d bytes", numUnits, backingBufferSize );
+    } else {
+      memset( pPool, 0, sizeof( MemPool ) );
+      LOG( "PoolSize Error. Cannot Allocate %u units from buffer of size %u bytes, overhead needed: %u bytes",
+            numUnits, backingBufferSize, ADDITIONAL_POOL_OVERHEAD( numUnits ) );
     }
   }
   return retval;
@@ -85,31 +93,31 @@ void PoolRelease( MemPool* pPool )
 
 static uint32_t GetFreeIndex( MemPool* pPool, uint32_t levelDeep )
 {
-  if ( levelDeep < CEIL_DIV( pPool->numOfUnits, sizeof( uint32_t ) * CHAR_BIT ) ) {
+  if ( levelDeep < FREE_BITMASK_SIZE_IN_ULONG( pPool->numOfUnits ) ) {
     uint32_t bitField = *( pPool->pFreeBits + levelDeep );
     uint32_t freeLocation = __builtin_ctz( bitField );
     if ( freeLocation < 32 ) {
-      return ( levelDeep * ( CHAR_BIT * sizeof( uint32_t ) ) + freeLocation );
+      return ( levelDeep * ( SINGLE_BITMASK_CAPACITY ) + freeLocation );
     }
     else {
       return GetFreeIndex( pPool, levelDeep + 1 );
     }
   }
   else 
-    return levelDeep * ( CHAR_BIT * sizeof( uint32_t ) );
+    return levelDeep * SINGLE_BITMASK_CAPACITY;
 }
 
 static void MarkIndexFree( MemPool* pPool, uint32_t index, uint32_t levelDeep )
 {
   if ( index < pPool->numOfUnits ) {
-    if ( index < CHAR_BIT * sizeof( uint32_t ) ) {
+    if ( index < SINGLE_BITMASK_CAPACITY ) {
       uint32_t* pBits = pPool->pFreeBits + levelDeep;
       LOG( "%s(): Old: %p",__FUNCTION__, *pBits );
       *pBits &= ( 1 << index );
       LOG( "%s(): New: %p", __FUNCTION__, *pBits );
     }
     else {
-      MarkIndexFree( pPool, index - ( CHAR_BIT * sizeof( uint32_t ) ), levelDeep++ );
+      MarkIndexFree( pPool, index - SINGLE_BITMASK_CAPACITY, levelDeep + 1 );
     }
   }
   else {
@@ -142,8 +150,10 @@ void* PoolAlloc( MemPool* pPool )
 
 void PoolFree( MemPool* pPool, void* buf )
 {
-  if ( pPool && buf ) {
-    uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore );
+  if ( pPool && buf && buf >= pPool->pBackingStore && buf < (pPool->pBackingStore + pPool->backingBufferSize) ) {
+    uint32_t actualSizeOfPool = pPool->backingBufferSize - ADDITIONAL_POOL_OVERHEAD( pPool->numOfUnits );
+    uint32_t unitSize = actualSizeOfPool / pPool->numOfUnits;
+    uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore ) / unitSize ;
     if ( indexToFree >= pPool->numOfUnits ) {
       LOG( "%s(): Got out of bounds index to free: %d, ptr: %p (start: %p)", 
            __FUNCTION__, indexToFree, buf, pPool->pBackingStore );
