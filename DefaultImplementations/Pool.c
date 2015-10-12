@@ -25,7 +25,6 @@
 #include "Pool.h"
 #include <assert.h>
 #include <string.h>
-#include <limits.h>
 #include "Logable.h"
 
 #ifdef __cplusplus
@@ -37,7 +36,6 @@ static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
 #undef LOG
 #define LOG( str, ... )   Log( &s_poolLog, str, ##__VA_ARGS__ )
 
-#define SINGLE_BITMASK_CAPACITY                 ( CHAR_BIT * sizeof( uint32_t ) )
 #define FREE_BITMASK_SIZE_IN_ULONG(numUnits)    CEIL_DIV( numUnits, SINGLE_BITMASK_CAPACITY )
 
 bool PoolCreate( MemPool* pPool,
@@ -48,7 +46,7 @@ bool PoolCreate( MemPool* pPool,
   bool retval = false;
   if ( pPool && pBackingBuffer ) {
     uint32_t i = 0;
-    uint32_t actualBackingBufferSize = pPool->backingBufferSize - ADDITIONAL_POOL_OVERHEAD( numUnits );
+    uint32_t actualBackingBufferSize = backingBufferSize - ADDITIONAL_POOL_OVERHEAD( numUnits );
 
     pPool->pBackingStore = pBackingBuffer;
     pPool->backingBufferSize = backingBufferSize;
@@ -96,7 +94,7 @@ static uint32_t GetFreeIndex( MemPool* pPool, uint32_t levelDeep )
   if ( levelDeep < FREE_BITMASK_SIZE_IN_ULONG( pPool->numOfUnits ) ) {
     uint32_t bitField = *( pPool->pFreeBits + levelDeep );
     uint32_t freeLocation = __builtin_ctz( bitField );
-    if ( freeLocation < 32 ) {
+    if ( bitField && freeLocation < 32 ) {
       return ( levelDeep * ( SINGLE_BITMASK_CAPACITY ) + freeLocation );
     }
     else {
@@ -107,17 +105,21 @@ static uint32_t GetFreeIndex( MemPool* pPool, uint32_t levelDeep )
     return levelDeep * SINGLE_BITMASK_CAPACITY;
 }
 
-static void MarkIndexFree( MemPool* pPool, uint32_t index, uint32_t levelDeep )
+static void MarkIndex( MemPool* pPool, bool shouldFree, uint32_t index, uint32_t levelDeep )
 {
   if ( index < pPool->numOfUnits ) {
     if ( index < SINGLE_BITMASK_CAPACITY ) {
       uint32_t* pBits = pPool->pFreeBits + levelDeep;
       LOG( "%s(): Old: %p",__FUNCTION__, *pBits );
-      *pBits &= ( 1 << index );
+      if( shouldFree ) {
+        *pBits |= (1 << index);
+      } else {
+        *pBits &= ~( 1 << index );
+      }
       LOG( "%s(): New: %p", __FUNCTION__, *pBits );
     }
     else {
-      MarkIndexFree( pPool, index - SINGLE_BITMASK_CAPACITY, levelDeep + 1 );
+      MarkIndex( pPool, shouldFree, index - SINGLE_BITMASK_CAPACITY, levelDeep + 1 );
     }
   }
   else {
@@ -135,6 +137,7 @@ void* PoolAlloc( MemPool* pPool )
       if ( freeIndex < pPool->numOfUnits ) {
         uint32_t sizeofUnit = pPool->backingBufferSize / pPool->numOfUnits;
         retval = ( ( uint8_t* )pPool->pBackingStore + ( sizeofUnit * freeIndex ) );
+        MarkIndex( pPool, false, freeIndex, 0 );
         LOG( "%s(): Retval: %p ( index: %d )", __FUNCTION__, retval, freeIndex );
       }
       KMutexUnlock( &pPool->mutex );
@@ -160,7 +163,7 @@ void PoolFree( MemPool* pPool, void* buf )
       assert( 0 );
     }
     if ( KMutexLock( &pPool->mutex, WAIT_FOREVER ) ) {
-      MarkIndexFree( pPool, indexToFree, 0 );
+      MarkIndex( pPool, true, indexToFree, 0 );
       KMutexUnlock( &pPool->mutex );
     }
     else

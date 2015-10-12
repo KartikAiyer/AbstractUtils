@@ -1,10 +1,25 @@
 /**
- * Confidential!!!
- * Source code property of Blue Clover Design LLC.
+ * The MIT License (MIT)
  *
- * Demonstration, distribution, replication, or other use of the
- * source codes is NOT permitted without prior written consent
- * from Blue Clover Design.
+ * Copyright (c) <2014> <Kartik Aiyer>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 #ifndef __POOL_H__
 #define __POOL_H__
@@ -45,10 +60,11 @@ typedef struct _MemPool
   KMutex mutex;
 }MemPool;
 
-#define CEIL_DIV( a, b )    ( (a) % (b) ) ? ( ( (a) / (b) ) + 1 ) : ( (a) / (b) )
+#define CEIL_DIV( a, b )    ( ( (a) % (b) ) ? ( ( (a) / (b) ) + 1 ) : ( (a) / (b) ) )
 
+#define SINGLE_BITMASK_CAPACITY                 ( CHAR_BIT * sizeof( uint32_t ) )
 #define ADDITIONAL_POOL_OVERHEAD( totalAllocationUnits )\
-  ( CEIL_DIV( ( totalAllocationUnits ), CHAR_BIT * sizeof( uint32_t ) ) * sizeof( uint32_t ) )
+  ( CEIL_DIV( ( totalAllocationUnits ), SINGLE_BITMASK_CAPACITY ) * sizeof( uint32_t ) )
 #define POOL_STORE_SIZE( totalAllocationUnits, sizeOfUnit )\
   ( (sizeOfUnit)*(totalAllocationUnits) + ADDITIONAL_POOL_OVERHEAD( (totalAllocationUnits) ) )
 /**
