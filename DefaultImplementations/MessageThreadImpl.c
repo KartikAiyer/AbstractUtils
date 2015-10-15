@@ -104,7 +104,8 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
           KTHREAD_CREATE_PARAMS( messageThread, 
                                  pThreadParams->threadName, 
                                  Thread, 
-                                 pThread, 
+                                 pThread,
+                                 NULL,
                                  pThreadParams->stackSize, 
                                  pThreadParams->priority );
            

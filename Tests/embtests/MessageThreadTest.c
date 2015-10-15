@@ -9,10 +9,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,47 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __THREAD_INTERFACE_H__
-#define __THREAD_INTERFACE_H__
+#include <embUnit/embUnit.h>
+#include <MessageThread.h>
 
-#include <InterfacePrivateCommon.h>
-#include <PlatformInterface.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern const uint32_t KThreadHandleSize;
-
-typedef struct _KThreadCreateParams
+#define MESSAGE_THREAD_TEST_NUM_MESSAGES        (50)
+#if 0
+typedef struct _MessageThreadTestDataType
 {
-  KThreadCallback fn;
-  const char* pThreadName;
-  void* threadArg;
-  void* pStack;
-  uint32_t stackSizeInBytes;
-  uint32_t threadPriority; 
-}KThreadCreateParams;
+  uint32_t val;
+}MessageThreadTestDataType;
 
-#define KTHREAD_CREATE_PARAMS( varName, pName, f, arg, pStk, stkSize, priority )\
-const KThreadCreateParams kthreadParams_##varName = \
-{\
-  .pThreadName = pName,\
-  .fn = f,\
-  .threadArg = arg,\
-  .pStack = pStk,\
-  .stackSizeInBytes = stkSize,\
-  .threadPriority = priority\
+typedef struct _MessageThreadTest
+{
+  uint8_t msgStore[ MESSAGE_THREAD_BACKING_STORE_SIZE( MESSAGE_THREAD_TEST_NUM_MESSAGES, MessageThreadTestDataType ) ];
+}MessageThreadTest;
+
+static MessageThreadTest s_tstData;
+
+static void SetUp()
+{
+
 }
 
-#define KTHREAD_PARAMS( varName ) &kthreadParams_##varName
+static void TearDown()
+{}
 
-bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams ); 
-bool KThreadDelete( KThread* pThread );
-bool KThreadJoin( KThread* pThread );
+static void MessageThreadCanCreate()
+{
 
-#ifdef __cplusplus
+}
+TestRef MessageThreadTest_ApiTests()
+{
+  EMB_UNIT_TESTFIXTURES(fixtures) {
+
+  };
+  EMB_UNIT_TESTCALLER( MessageThreadApiTest, "MessageThreadApiTest", SetUp, TearDown, fixtures );
+  return &MessageThreadApiTest;
 }
 #endif
-#endif
-

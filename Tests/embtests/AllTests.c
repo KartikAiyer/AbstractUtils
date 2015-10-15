@@ -24,13 +24,17 @@
 #include<embUnit.h>
 #include <ThreadInterface.h>
 
-extern TestRef PoolTest_ApiTests(void);
+extern TestRef PoolTest_ApiTests();
+extern TestRef KThreadTest_ApiTests();
+extern TestRef PriorityWakeTest();
 
 int main (int argc, const char* argv[])
 {
   TestRunner_start();
   {
     TestRunner_runTest( PoolTest_ApiTests() );
+    TestRunner_runTest( KThreadTest_ApiTests() );
+    TestRunner_runTest( PriorityWakeTest() );
   }
   TestRunner_end();
 }

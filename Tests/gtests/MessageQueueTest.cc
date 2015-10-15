@@ -40,7 +40,7 @@ public:
   void SetupQueue( void (*act)(void* arg), uint32_t queueSize )
   {
     //KThreadCreateParams params =  { .pThreadName = "TestThread", .fn = TestFunction, .stackSizeInBytes = 1024 * 6, .threadPriority = 0, .threadArg = this };
-    KTHREAD_CREATE_PARAMS( thrPar, "TestThread", TestFunction, this, 1024*8, 0 );
+    KTHREAD_CREATE_PARAMS( thrPar, "TestThread", TestFunction, this, NULL, 1024*8, 0 );
     queueStore = ( void** )malloc( MESSAGE_QUEUE_STORE_OVERHEAD( queueSize) );
     action = act;
     if( !MessageQueueInitialize( &queue, queueStore, queueSize ) ) {
