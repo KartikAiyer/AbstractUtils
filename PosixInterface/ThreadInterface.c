@@ -53,7 +53,7 @@ bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams )
       if ( !err ) {
         err = pthread_attr_setstacksize( &attr, pParams->stackSizeInBytes );
         if( !err ) {
-          schedParam.sched_priority = 0;
+          schedParam.sched_priority = pParams->threadPriority;
           err = pthread_attr_setschedpolicy( &attr, SCHED_OTHER );
           if ( !err ) {
             pthread_attr_setschedparam( &attr, &schedParam );
