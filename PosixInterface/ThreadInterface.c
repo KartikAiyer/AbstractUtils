@@ -25,6 +25,7 @@
 #include <ThreadInterface.h>
 #include <Logable.h>
 #include <pthread.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,7 @@ const uint32_t KThreadHandleSize = sizeof( KThread );
 static void* Thread( void* arg )
 {
   KThread* pThread = ( KThread* )arg;
+  pthread_setname_np( pThread->threadName );
   pThread->fn( pThread->arg );
   pThread->isComplete = true;
   return NULL;
@@ -54,12 +56,18 @@ bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams )
         err = pthread_attr_setstacksize( &attr, pParams->stackSizeInBytes );
         if( !err ) {
           schedParam.sched_priority = pParams->threadPriority;
-          err = pthread_attr_setschedpolicy( &attr, SCHED_OTHER );
+          err = pthread_attr_setschedpolicy( &attr, SCHED_RR );
           if ( !err ) {
             pthread_attr_setschedparam( &attr, &schedParam );
             pThread->fn = pParams->fn;
             pThread->arg = pParams->threadArg;
             pThread->isComplete = false;
+            pThread->sanity = THREAD_SANITY_CHECK;
+            if( pParams->pThreadName ) {
+              strncpy( pThread->threadName, pParams->pThreadName, sizeof( pThread->threadName ) );
+            } else {
+              memset( pThread->threadName, 0, sizeof( pThread->threadName ) );
+            }
             err = pthread_create( &pThread->pthread, &attr, Thread, pThread );
             if ( !err ) {
               retval  = true;
@@ -106,6 +114,20 @@ bool KThreadJoin( KThread* pThread )
     }
   } 
   return retval;
+}
+
+int32_t KThreadGetPriority( KThread* pThread )
+{
+  struct sched_param params = { 0 };
+  int policy;
+
+  pthread_getschedparam( pThread->pthread, &policy, &params );
+  return params.sched_priority;
+}
+
+const char* KThreadGetName( KThread* pThread )
+{
+  return pThread->threadName;
 }
 
 #ifdef __cplusplus

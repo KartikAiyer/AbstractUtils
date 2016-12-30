@@ -33,12 +33,16 @@ extern "C" {
 
 typedef void ( *KThreadCallback )( void* arg );
 
+#define THREAD_NAME_MAX_SIZE          ( 20 )
+#define THREAD_SANITY_CHECK           ( 0xDEADBEEF )
 typedef struct _KThread
 {
   pthread_t pthread;
   KThreadCallback fn;
   void* arg;
   bool isComplete;
+  char threadName[ THREAD_NAME_MAX_SIZE ];
+  uint32_t sanity;
 }KThread;
 
 typedef struct _KSema {

@@ -76,7 +76,7 @@ static void SemaphorePriorityWake()
       data[ i ].threadNum = i;
       data[ i ].pSema = &sem;
       KTHREAD_CREATE_PARAMS( threadParams,
-                             "Thread",
+                             name,
                              SemaphorePriorityWakeThread,
                              &data[ i ],
                              NULL,

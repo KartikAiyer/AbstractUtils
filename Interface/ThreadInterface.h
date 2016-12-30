@@ -59,6 +59,8 @@ const KThreadCreateParams kthreadParams_##varName = \
 bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams ); 
 bool KThreadDelete( KThread* pThread );
 bool KThreadJoin( KThread* pThread );
+const char* KThreadGetName( KThread* pThread );
+int32_t KThreadGetPriority( KThread* pThread );
 
 #ifdef __cplusplus
 }

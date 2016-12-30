@@ -27,6 +27,7 @@
 extern TestRef PoolTest_ApiTests();
 extern TestRef KThreadTest_ApiTests();
 extern TestRef PriorityWakeTest();
+extern TestRef PriorityDonateChainTest();
 
 int main (int argc, const char* argv[])
 {
@@ -34,7 +35,8 @@ int main (int argc, const char* argv[])
   {
     TestRunner_runTest( PoolTest_ApiTests() );
     TestRunner_runTest( KThreadTest_ApiTests() );
-    TestRunner_runTest( PriorityWakeTest() );
+    //TestRunner_runTest( PriorityWakeTest() );
+    TestRunner_runTest( PriorityDonateChainTest() );
   }
   TestRunner_end();
 }
