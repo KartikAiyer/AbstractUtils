@@ -24,6 +24,11 @@
 
 #include <SemaphoreInterface.h>
 #include <semaphore.h>
+#ifdef LINUX_PTHREAD // On MAC OSX I don't need these
+#include <pthread.h>
+#include <fcntl.h>
+#include <limits.h>
+#endif
 #include <Logable.h>
 #include <string.h>
 #include <stdlib.h>

@@ -36,7 +36,11 @@ const uint32_t KThreadHandleSize = sizeof( KThread );
 static void* Thread( void* arg )
 {
   KThread* pThread = ( KThread* )arg;
+#ifdef LINUX_PTHREAD
+  pthread_setname_np( pThread->pthread, pThread->threadName );
+#else
   pthread_setname_np( pThread->threadName );
+#endif
   pThread->fn( pThread->arg );
   pThread->isComplete = true;
   return NULL;

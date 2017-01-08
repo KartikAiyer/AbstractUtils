@@ -65,8 +65,8 @@ static void PoolCanAllocateOne()
 {
   void* pBuf = PoolAlloc( &s_poolTestBasicData.pool );
   TEST_ASSERT_NOT_NULL( pBuf );
-  TEST_ASSERT( ( pBuf >= s_poolTestBasicData.poolStore &&
-                 pBuf < s_poolTestBasicData.poolStore + sizeof( s_poolTestBasicData.poolStore ) ) );
+  TEST_ASSERT( ( pBuf >= (void*)s_poolTestBasicData.poolStore &&
+                 pBuf < (void*)s_poolTestBasicData.poolStore + sizeof( s_poolTestBasicData.poolStore ) ) );
   PoolFree( &s_poolTestBasicData.pool, pBuf );
 }
 
