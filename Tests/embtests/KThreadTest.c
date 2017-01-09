@@ -54,7 +54,7 @@ static void TearDown()
 static void ThreadApiTest()
 {
   KThread thread;
-  KTHREAD_CREATE_PARAMS( threadParams, "Test Thread", TestThreadFunction, NULL, NULL, 1024 * 8, 100 );
+  KTHREAD_CREATE_PARAMS( threadParams, "Test Thread", TestThreadFunction, NULL, NULL, 1024 * 16, 100 );
   bool retval = KThreadCreate( &thread, KTHREAD_PARAMS( threadParams ) );
   TEST_ASSERT( retval );
   retval = KThreadJoin( &thread );
@@ -95,14 +95,14 @@ static void TestBasicPremption()
                            PremptTestThreadMid,
                            NULL,
                            NULL,
-                           1024 * 8,
+                           1024 * 16,
                            100 );
     KTHREAD_CREATE_PARAMS( threadParamsHi,
                            "ThreadPremptTestHi",
                            PremptTestThreadHi,
                            NULL,
                            NULL,
-                           1024 * 8,
+                           1024 * 16,
                            120 );
     if( KThreadCreate( &threadMid, KTHREAD_PARAMS( threadParamsMid ) )) {
       if( KThreadCreate( &threadHi, KTHREAD_PARAMS( threadParamsHi ) )) {

@@ -57,7 +57,7 @@
 
 #define NESTING_DEPTH               (8)
 #define THREAD_STACK_SIZE           ( 1 << 14 )
-#define INTERLOPER_STACK_SIZE       ( 1 << 13 )
+#define INTERLOPER_STACK_SIZE       ( 1 << 14 )
 #define PRI_MIN       0
 
 typedef struct _LockPair
