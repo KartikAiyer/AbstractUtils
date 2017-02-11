@@ -6,4 +6,5 @@ AbstractUtils.mak
 Debug
 Release
 .idea
+cmake-*
 
