@@ -75,10 +75,10 @@ typedef struct _KQueue
 typedef void (*KListForEachCb)( KListElem *pElem, ... );  
 
 #define KLIST_HEAD_INIT( pHead )     do { if( (pHead) ){ (pHead)->prev = (pHead)->next = 0; } }while(0)
-#define KLIST_HEAD_FOREACH( pHead, fnHandler, handlerArgs... )  do {\
+#define KLIST_HEAD_FOREACH( pHead, fnHandler, ... )  do {\
                                                   KListElem *pElem = (pHead);\
                                                   while( pElem ) {\
-                                                    fnHandler( pElem, ##handlerArgs );\
+                                                    fnHandler( pElem, ##__VA_ARGS__);\
                                                     pElem = pElem->next;\
                                                   }\
                                                 }while( 0 )

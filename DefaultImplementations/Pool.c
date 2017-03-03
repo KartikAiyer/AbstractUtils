@@ -153,7 +153,7 @@ void* PoolAlloc( MemPool* pPool )
 
 void PoolFree( MemPool* pPool, void* buf )
 {
-  if ( pPool && buf && buf >= pPool->pBackingStore && buf < (pPool->pBackingStore + pPool->backingBufferSize) ) {
+  if ( pPool && buf && buf >= (void*)pPool->pBackingStore && buf < (pPool->pBackingStore + pPool->backingBufferSize) ) {
     uint32_t actualSizeOfPool = pPool->backingBufferSize - ADDITIONAL_POOL_OVERHEAD( pPool->numOfUnits );
     uint32_t unitSize = actualSizeOfPool / pPool->numOfUnits;
     uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore ) / unitSize ;

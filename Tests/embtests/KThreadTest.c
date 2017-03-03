@@ -25,8 +25,6 @@
 #include <embUnit/embUnit.h>
 #include <ThreadInterface.h>
 #include <MutexInterface.h>
-#include <string.h>
-#include <unistd.h>
 
 typedef struct _ThreadTest1Data
 {
@@ -38,20 +36,20 @@ static Test1Data s_tst1 = { 0 };
 
 static void TestThreadFunction( void *arg )
 {
-  usleep( 1000000 );
+ // usleep( 1000000 );
   s_tst1.value = 1;
 }
 
-static void SetUp()
+static void SetUp(void)
 {
 
 }
-static void TearDown()
+static void TearDown(void)
 {
 
 }
 
-static void ThreadApiTest()
+static void ThreadApiTest(void)
 {
   KThread thread;
   KTHREAD_CREATE_PARAMS( threadParams, "Test Thread", TestThreadFunction, NULL, NULL, 1024 * 16, 100 );
@@ -83,7 +81,7 @@ static void PremptTestThreadMid( void *arg )
   }
 }
 
-static void TestBasicPremption()
+static void TestBasicPremption( void )
 {
   memset( &s_tst1, 0, sizeof( s_tst1 ));
   if( KMutexCreate( &s_tst1.mtx, "ThreadPremptTestMtx" )) {

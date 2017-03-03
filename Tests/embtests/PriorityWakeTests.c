@@ -36,10 +36,10 @@ typedef struct _SemPriWakeData
 } SemPriWakeData;
 static uint32_t s_currentThreadPriority = 0;
 
-static void SetUp()
+static void SetUp( void )
 {}
 
-static void TearDown()
+static void TearDown( void )
 {}
 
 static void SemaphorePriorityWakeThread( void *arg )
@@ -58,18 +58,18 @@ static void SemaphorePrioritySemUpThread( void *arg )
   KSemaPut( pSema );
 }
 
-static void SemaphorePriorityWake()
+static void SemaphorePriorityWake( void )
 {
 //Tests that the highest-priority thread waiting
 // on a semaphore is the first to wake up.
-  const int kNumOfThread = 10;
+#define NUM_OF_THREADS 10
   KSema sem;
-  SemPriWakeData data[kNumOfThread];
-  KThread threads[kNumOfThread];
+  SemPriWakeData data[NUM_OF_THREADS];
+  KThread threads[NUM_OF_THREADS];
   KThread lastThread;
   uint32_t priority = s_currentThreadPriority = 100;
   if( KSemaCreate( &sem, "SemPriWakeTest", 0 )) {
-    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+    for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
       char name[20] = {0};
       sprintf( name, "Thread %d", i );
       data[ i ].priority = priority;
@@ -100,14 +100,15 @@ static void SemaphorePriorityWake()
     }
     KThreadJoin( &lastThread );
     KThreadDelete( &lastThread );
-    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+    for( uint32_t i = 0; i < NUM_OF_THREADS ; i++ ) {
       KThreadJoin( &threads[ i ] );
     }
-    for( uint32_t i = 0; i < kNumOfThread; i++ ) {
+    for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
       KThreadDelete( &threads[ i ] );
     }
     KSemaDelete( &sem );
   }
+#undef NUM_OF_THREADS
 }
 
 TestRef PriorityWakeTest()

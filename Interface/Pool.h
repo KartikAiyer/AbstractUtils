@@ -53,7 +53,7 @@ extern "C" {
  */
 typedef struct _MemPool
 {
-  void* pBackingStore;
+  uint8_t* pBackingStore;
   uint32_t* pFreeBits;
   uint32_t backingBufferSize;
   uint32_t numOfUnits;

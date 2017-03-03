@@ -43,7 +43,7 @@ typedef struct _PoolTestBasicData
 }PoolTestBasicData;
 
 static PoolTestBasicData s_poolTestBasicData;
-static void setUp()
+static void setUp( void )
 {
   s_poolTestBasicData.poolCreated = PoolCreate( &s_poolTestBasicData.pool,
                                                 s_poolTestBasicData.poolStore,
@@ -51,26 +51,26 @@ static void setUp()
                                                 POOL_TEST1_STORE_COUNT );
 }
 
-static void tearDown()
+static void tearDown( void )
 {
   PoolRelease( &s_poolTestBasicData.pool );
 }
 
-static void PoolCanBeCreated()
+static void PoolCanBeCreated( void )
 {
   TEST_ASSERT_EQUAL_INT( true, s_poolTestBasicData.poolCreated );
 }
 
-static void PoolCanAllocateOne()
+static void PoolCanAllocateOne( void )
 {
   void* pBuf = PoolAlloc( &s_poolTestBasicData.pool );
   TEST_ASSERT_NOT_NULL( pBuf );
-  TEST_ASSERT( ( pBuf >= (void*)s_poolTestBasicData.poolStore &&
-                 pBuf < (void*)s_poolTestBasicData.poolStore + sizeof( s_poolTestBasicData.poolStore ) ) );
+  TEST_ASSERT( ( pBuf >= s_poolTestBasicData.poolStore &&
+                 pBuf < s_poolTestBasicData.poolStore + sizeof( s_poolTestBasicData.poolStore ) ) );
   PoolFree( &s_poolTestBasicData.pool, pBuf );
 }
 
-static void PoolAllocateAll()
+static void PoolAllocateAll( void )
 {
   for( uint32_t i = 0; i < POOL_TEST1_STORE_COUNT; i++ )
   {
@@ -80,7 +80,7 @@ static void PoolAllocateAll()
   }
 }
 
-static void PoolAllocateAfterReleasingFullPool()
+static void PoolAllocateAfterReleasingFullPool( void )
 {
   void* pBuf[ POOL_TEST1_STORE_COUNT ] = { 0 };
   for( uint32_t i = 0; i < POOL_TEST1_STORE_COUNT; i++ ) {
@@ -97,7 +97,7 @@ static void PoolAllocateAfterReleasingFullPool()
   TEST_ASSERT( pBuf[ 0 ] == s_poolTestBasicData.poolStore );
 }
 
-static void PoolShouldCompletlyFreeUp()
+static void PoolShouldCompletlyFreeUp( void )
 {
   void* pBuf[ POOL_TEST1_STORE_COUNT ] = { 0 };
   for( uint32_t i = 0; i < POOL_TEST1_STORE_COUNT; i++ )
