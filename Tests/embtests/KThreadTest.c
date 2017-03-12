@@ -49,16 +49,29 @@ static void TearDown(void)
 
 }
 
-static void ThreadApiTest(void)
+typedef struct _ThreadData
 {
   KThread thread;
-  KTHREAD_CREATE_PARAMS( threadParams, "Test Thread", TestThreadFunction, NULL, NULL, 1024 * 16, 100 );
-  bool retval = KThreadCreate( &thread, KTHREAD_PARAMS( threadParams ) );
+  uint8_t stack[ 1024 ];
+}ThreadData;
+
+
+static ThreadData s_testThreadA;
+static void ThreadApiTest(void)
+{
+  KTHREAD_CREATE_PARAMS( s_testThreadAParams, 
+                         "Test Thread", 
+                         TestThreadFunction, 
+                         NULL, 
+                         s_testThreadA.stack, 
+                         sizeof( s_testThreadA.stack ), 
+                         SEMANTIC_THREAD_PRIORITY_MID );
+  bool retval = KThreadCreate( &s_testThreadA.thread, KTHREAD_PARAMS( s_testThreadAParams ) );
   TEST_ASSERT( retval );
-  retval = KThreadJoin( &thread );
+  retval = KThreadJoin( &s_testThreadA.thread );
   TEST_ASSERT( retval );
   TEST_ASSERT( s_tst1.value == 1 );
-  retval = KThreadDelete( &thread );
+  retval = KThreadDelete( &s_testThreadA.thread );
   TEST_ASSERT( retval );
 }
 
@@ -81,33 +94,33 @@ static void PremptTestThreadMid( void *arg )
   }
 }
 
+static ThreadData s_testThreadMid;
+static ThreadData s_testThreadHi;
 static void TestBasicPremption( void )
 {
   memset( &s_tst1, 0, sizeof( s_tst1 ));
   if( KMutexCreate( &s_tst1.mtx, "ThreadPremptTestMtx" )) {
     s_tst1.value = 0;
-    KThread threadMid;
-    KThread threadHi;
     KTHREAD_CREATE_PARAMS( threadParamsMid,
                            "ThreadPremptTestMid",
                            PremptTestThreadMid,
                            NULL,
-                           NULL,
-                           1024 * 16,
-                           100 );
+                           s_testThreadMid.stack,
+                           sizeof( s_testThreadMid.stack ),
+                           SEMANTIC_THREAD_PRIORITY_LOWEST);
     KTHREAD_CREATE_PARAMS( threadParamsHi,
                            "ThreadPremptTestHi",
                            PremptTestThreadHi,
                            NULL,
-                           NULL,
-                           1024 * 16,
-                           120 );
-    if( KThreadCreate( &threadMid, KTHREAD_PARAMS( threadParamsMid ) )) {
-      if( KThreadCreate( &threadHi, KTHREAD_PARAMS( threadParamsHi ) )) {
-        TEST_ASSERT( KThreadJoin( &threadMid ) );
-        TEST_ASSERT( KThreadJoin( &threadHi ) );
-        TEST_ASSERT( KThreadDelete( &threadMid ) );
-        TEST_ASSERT( KThreadDelete( &threadHi ) );
+                           s_testThreadMid.stack,
+                           sizeof( s_testThreadMid.stack ),
+                           SEMANTIC_THREAD_PRIORITY_HIGH );
+    if( KThreadCreate( &s_testThreadMid.thread, KTHREAD_PARAMS( threadParamsMid ) )) {
+      if( KThreadCreate( &s_testThreadHi.thread, KTHREAD_PARAMS( threadParamsHi ) )) {
+        TEST_ASSERT( KThreadJoin( &s_testThreadMid.thread ) );
+        TEST_ASSERT( KThreadJoin( &s_testThreadHi.thread ) );
+        TEST_ASSERT( KThreadDelete( &s_testThreadMid.thread ) );
+        TEST_ASSERT( KThreadDelete( &s_testThreadHi.thread ) );
       }
     }
     KMutexDelete( &s_tst1.mtx );

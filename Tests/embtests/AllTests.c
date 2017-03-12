@@ -29,15 +29,33 @@ extern TestRef KThreadTest_ApiTests();
 extern TestRef PriorityWakeTest();
 extern TestRef PriorityDonateChainTest();
 
-int main (int argc, const char* argv[])
+#define TEST_RUNNER_STACK_SIZE          ( 1 << 14 )
+static uint8_t s_testRunnerThreadStack[ TEST_RUNNER_STACK_SIZE ];
+static KThread s_testRunnerThread;
+
+static void TestRunner( void* arg )
 {
   TestRunner_start();
   {
     TestRunner_runTest( PoolTest_ApiTests() );
     TestRunner_runTest( KThreadTest_ApiTests() );
-    //TestRunner_runTest( PriorityWakeTest() );
-    TestRunner_runTest( PriorityDonateChainTest() );
+    TestRunner_runTest( PriorityWakeTest() );
+    //TestRunner_runTest( PriorityDonateChainTest() );
   }
   TestRunner_end();
+  for ( ; ; );
+}
+int main (int argc, const char* argv[])
+{
+  KThreadCreateParams param = {
+    .pThreadName = "TestRunnerThread",
+    .threadPriority = SEMANTIC_THREAD_PRIORITY_LOWEST,
+    .threadArg = NULL,
+    .pStack = s_testRunnerThreadStack,
+    .stackSizeInBytes = TEST_RUNNER_STACK_SIZE,
+    .fn = TestRunner
+  };
+  KThreadCreate( &s_testRunnerThread, &param );
+  KThreadInit();
 }
 

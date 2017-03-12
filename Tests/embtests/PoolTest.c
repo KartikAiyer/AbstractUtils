@@ -63,7 +63,7 @@ static void PoolCanBeCreated( void )
 
 static void PoolCanAllocateOne( void )
 {
-  void* pBuf = PoolAlloc( &s_poolTestBasicData.pool );
+  uint8_t* pBuf = (uint8_t*)PoolAlloc( &s_poolTestBasicData.pool );
   TEST_ASSERT_NOT_NULL( pBuf );
   TEST_ASSERT( ( pBuf >= s_poolTestBasicData.poolStore &&
                  pBuf < s_poolTestBasicData.poolStore + sizeof( s_poolTestBasicData.poolStore ) ) );

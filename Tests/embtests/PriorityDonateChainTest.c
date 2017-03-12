@@ -94,11 +94,11 @@ static void DonorThreadFunction( void *args );
 static void InterloperThreadFunction( void *args );
 static TestData s_data = { 0 };
 
-static void Setup()
+static void Setup( void )
 {
 }
 
-static void TearDown()
+static void TearDown( void )
 {
 }
 
@@ -169,7 +169,7 @@ static void StartThread( void* arg )
   TEST_ASSERT( KThreadJoin( &pTestData->threads[ 1 ] ) && KThreadJoin( &pTestData->interloperThreads[ 1 ] ) );
 }
 
-static void TestPriorityDonateChain()
+static void TestPriorityDonateChain( void )
 {
   TestData* pTestData = &s_data;
   pTestData->currentThreadIndexToRelease = 0;

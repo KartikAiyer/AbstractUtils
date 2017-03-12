@@ -25,6 +25,7 @@
 #include "Pool.h"
 #include <assert.h>
 #include <string.h>
+#include <miscutils.h>
 #include "Logable.h"
 
 #ifdef __cplusplus
@@ -93,7 +94,7 @@ static uint32_t GetFreeIndex( MemPool* pPool, uint32_t levelDeep )
 {
   if ( levelDeep < FREE_BITMASK_SIZE_IN_ULONG( pPool->numOfUnits ) ) {
     uint32_t bitField = *( pPool->pFreeBits + levelDeep );
-    uint32_t freeLocation = __builtin_ctz( bitField );
+    uint32_t freeLocation = ctz( bitField );
     if ( bitField && freeLocation < 32 ) {
       return ( levelDeep * ( SINGLE_BITMASK_CAPACITY ) + freeLocation );
     }
@@ -153,7 +154,7 @@ void* PoolAlloc( MemPool* pPool )
 
 void PoolFree( MemPool* pPool, void* buf )
 {
-  if ( pPool && buf && buf >= (void*)pPool->pBackingStore && buf < (pPool->pBackingStore + pPool->backingBufferSize) ) {
+  if ( pPool && buf && buf >= (void*)pPool->pBackingStore && buf < (void*)(pPool->pBackingStore + pPool->backingBufferSize) ) {
     uint32_t actualSizeOfPool = pPool->backingBufferSize - ADDITIONAL_POOL_OVERHEAD( pPool->numOfUnits );
     uint32_t unitSize = actualSizeOfPool / pPool->numOfUnits;
     uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore ) / unitSize ;

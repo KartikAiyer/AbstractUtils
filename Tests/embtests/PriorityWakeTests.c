@@ -58,16 +58,22 @@ static void SemaphorePrioritySemUpThread( void *arg )
   KSemaPut( pSema );
 }
 
+typedef struct _ThreadData
+{
+  KThread thread;
+  uint8_t threadStack[ 512 ];
+}ThreadData;
+
 static void SemaphorePriorityWake( void )
 {
 //Tests that the highest-priority thread waiting
 // on a semaphore is the first to wake up.
-#define NUM_OF_THREADS 10
+#define NUM_OF_THREADS  ( SEMANTIC_THREAD_PRIORITY_HIGHEST + 1 )
   KSema sem;
   SemPriWakeData data[NUM_OF_THREADS];
-  KThread threads[NUM_OF_THREADS];
-  KThread lastThread;
-  uint32_t priority = s_currentThreadPriority = 100;
+  static ThreadData threads[NUM_OF_THREADS];
+  static ThreadData lastThread;
+  uint32_t priority = s_currentThreadPriority = SEMANTIC_THREAD_PRIORITY_HIGHEST;
   if( KSemaCreate( &sem, "SemPriWakeTest", 0 )) {
     for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
       char name[20] = {0};
@@ -79,10 +85,10 @@ static void SemaphorePriorityWake( void )
                              name,
                              SemaphorePriorityWakeThread,
                              &data[ i ],
-                             NULL,
-                             1024 * 8,
+                             threads[ i ].threadStack,
+                             sizeof( threads[ i ].threadStack ),
                              priority-- );
-      if( !KThreadCreate( &threads[ i ], KTHREAD_PARAMS( threadParams ) )) {
+      if( !KThreadCreate( &threads[ i ].thread, KTHREAD_PARAMS( threadParams ) )) {
         TEST_FAIL( "Couldn't create test thread" );
         break;
       }
@@ -92,17 +98,17 @@ static void SemaphorePriorityWake( void )
                            "SemUpThread",
                            SemaphorePrioritySemUpThread,
                            &sem,
-                           NULL,
-                           1024 * 8,
+                           lastThread.threadStack,
+                           sizeof( lastThread.threadStack ),
                            --priority );
-    if( !KThreadCreate( &lastThread, KTHREAD_PARAMS( threadLoPri ) )) {
+    if( !KThreadCreate( &lastThread.thread, KTHREAD_PARAMS( threadLoPri ) )) {
       TEST_FAIL( "Couldn't create lowest priority thread" );
     }
     KThreadJoin( &lastThread );
-    KThreadDelete( &lastThread );
     for( uint32_t i = 0; i < NUM_OF_THREADS ; i++ ) {
       KThreadJoin( &threads[ i ] );
     }
+    KThreadDelete( &lastThread );
     for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
       KThreadDelete( &threads[ i ] );
     }

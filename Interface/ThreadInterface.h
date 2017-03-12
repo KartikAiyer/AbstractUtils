@@ -56,6 +56,7 @@ const KThreadCreateParams kthreadParams_##varName = \
 
 #define KTHREAD_PARAMS( varName ) &kthreadParams_##varName
 
+void KThreadInit();
 bool KThreadCreate( KThread* pThread, const KThreadCreateParams* pParams ); 
 bool KThreadDelete( KThread* pThread );
 bool KThreadJoin( KThread* pThread );
