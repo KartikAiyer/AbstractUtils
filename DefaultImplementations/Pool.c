@@ -22,20 +22,18 @@
  * THE SOFTWARE.
  */
 
-#include "Pool.h"
+#include <Pool.h>
 #include <assert.h>
 #include <string.h>
 #include <miscutils.h>
-#include "Logable.h"
+#include <ConsoleLog.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static Logable s_poolLog = { .prefix = "Pool", .enabled = false };
-
-#undef LOG
-#define LOG( str, ... )   Log( &s_poolLog, str, ##__VA_ARGS__ )
+#undef POOL_LOG
+#define POOL_LOG( str, ... )   ConsoleLogLine( str, ##__VA_ARGS__ )
 
 #define FREE_BITMASK_SIZE_IN_ULONG(numUnits)    CEIL_DIV( numUnits, SINGLE_BITMASK_CAPACITY )
 
@@ -62,11 +60,11 @@ bool PoolCreate( MemPool* pPool,
         retval = true;
       }
       else {
-        LOG( "Couldn't Initialize Mutex" );
+        POOL_LOG( "Couldn't Initialize Mutex" );
       }
     } else {
       memset( pPool, 0, sizeof( MemPool ) );
-      LOG( "PoolSize Error. Cannot Allocate %u units from buffer of size %u bytes, overhead needed: %u bytes",
+      POOL_LOG( "PoolSize Error. Cannot Allocate %u units from buffer of size %u bytes, overhead needed: %u bytes",
             numUnits, backingBufferSize, ADDITIONAL_POOL_OVERHEAD( numUnits ) );
     }
   }
@@ -84,7 +82,7 @@ void PoolRelease( MemPool* pPool )
       pPool->pFreeBits = 0;
     }
     else{
-      LOG( "%s(): Unable to lock mutex for release", __FUNCTION__ );
+      POOL_LOG( "%s(): Unable to lock mutex for release", __FUNCTION__ );
       assert( 0 );
     }
   }
@@ -111,20 +109,20 @@ static void MarkIndex( MemPool* pPool, bool shouldFree, uint32_t index, uint32_t
   if ( index < pPool->numOfUnits ) {
     if ( index < SINGLE_BITMASK_CAPACITY ) {
       uint32_t* pBits = pPool->pFreeBits + levelDeep;
-      LOG( "%s(): Old: %p",__FUNCTION__, *pBits );
+      POOL_LOG( "%s(): Old: %p",__FUNCTION__, *pBits );
       if( shouldFree ) {
         *pBits |= (1 << index);
       } else {
         *pBits &= ~( 1 << index );
       }
-      LOG( "%s(): New: %p", __FUNCTION__, *pBits );
+      POOL_LOG( "%s(): New: %p", __FUNCTION__, *pBits );
     }
     else {
       MarkIndex( pPool, shouldFree, index - SINGLE_BITMASK_CAPACITY, levelDeep + 1 );
     }
   }
   else {
-    LOG( "%s(): Invalid Index to free: %d, Total: %d", __FUNCTION__, index, pPool->numOfUnits );
+    POOL_LOG( "%s(): Invalid Index to free: %d, Total: %d", __FUNCTION__, index, pPool->numOfUnits );
     assert( 0 );
   }
 }
@@ -139,13 +137,13 @@ void* PoolAlloc( MemPool* pPool )
         uint32_t sizeofUnit = pPool->backingBufferSize / pPool->numOfUnits;
         retval = ( ( uint8_t* )pPool->pBackingStore + ( sizeofUnit * freeIndex ) );
         MarkIndex( pPool, false, freeIndex, 0 );
-        LOG( "%s(): Retval: %p ( index: %d )", __FUNCTION__, retval, freeIndex );
+        POOL_LOG( "%s(): Retval: %p ( index: %d )", __FUNCTION__, retval, freeIndex );
       }
       KMutexUnlock( &pPool->mutex );
     }
     else
     {
-      LOG( "%s(): Couldn't lock mutex", __FUNCTION__ );
+      POOL_LOG( "%s(): Couldn't lock mutex", __FUNCTION__ );
       assert( 0 );
     }
   }
@@ -159,7 +157,7 @@ void PoolFree( MemPool* pPool, void* buf )
     uint32_t unitSize = actualSizeOfPool / pPool->numOfUnits;
     uint32_t indexToFree = ( uint32_t )( (uint8_t*)buf - (uint8_t*)pPool->pBackingStore ) / unitSize ;
     if ( indexToFree >= pPool->numOfUnits ) {
-      LOG( "%s(): Got out of bounds index to free: %d, ptr: %p (start: %p)", 
+      POOL_LOG( "%s(): Got out of bounds index to free: %d, ptr: %p (start: %p)", 
            __FUNCTION__, indexToFree, buf, pPool->pBackingStore );
       assert( 0 );
     }
@@ -169,7 +167,7 @@ void PoolFree( MemPool* pPool, void* buf )
     }
     else
     {
-      LOG( "%s(): Couldn't lock mutex", __FUNCTION__ );
+      POOL_LOG( "%s(): Couldn't lock mutex", __FUNCTION__ );
       assert( 0 );
     }
   }

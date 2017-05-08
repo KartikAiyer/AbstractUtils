@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#define SM_LOG(str, ...)          (Log( (&pStateMac->logger), str, ##__VA_ARGS__))
+#define SM_LOG(str, ...)          (ConsoleLogLine( str, ##__VA_ARGS__))
 #define SM_DEFAULT_LOGGING          (true)
 
 static void StateMachineInitialize( StateMachine* pSm )
@@ -51,8 +51,6 @@ StateMachine* StateMachineCreate( const StateMachineInitParams* pInit )
   pStateMac->fnMachineInit = pInit->fnInit;
   pStateMac->pPrivate = pInit->pPrivate;
 
-  pStateMac->logger.enabled = SM_DEFAULT_LOGGING;
-  pStateMac->logger.prefix = pInit->pName;
   if ( pStateMac->fnMachineInit ) {
     pStateMac->fnMachineInit( pStateMac );
   }

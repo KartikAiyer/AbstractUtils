@@ -52,7 +52,7 @@
 #include <embUnit/embUnit.h>
 #include <ThreadInterface.h>
 #include <MutexInterface.h>
-#include <Logable.h>
+#include <ConsoleLog.h>
 #include <stdio.h>
 
 #define NESTING_DEPTH               (8)
@@ -106,18 +106,17 @@ static void StartThread( void* arg )
 {
   KMutex locks[NESTING_DEPTH - 1];
   DonorThreadParams donorParams[ NESTING_DEPTH ];
-  InterloperParams interloperParams[ NESTING_DEPTH ];
   TestData* pTestData = ( TestData* ) arg;
 
   for (uint32_t i = 0; i < NESTING_DEPTH - 1; i++) {
     char tmp[30];
     bool workerMutexCreateResult = false;
-    sprintf( tmp , "Mutex %d", i );
+    sprintf_s( tmp, sizeof(tmp), "Mutex %d", i );
     workerMutexCreateResult = KMutexCreate( &locks[ i ], tmp );
   }
 
   KMutexLock( &locks[0], WAIT_FOREVER );
-  LOG( "%s got lock, My Priority: %d", s_data.threads[0].threadName,
+  ConsoleLogLine( "%s got lock, My Priority: %d", s_data.threads[0].threadName,
        KThreadGetPriority( &pTestData->threads[ 0 ] ) );
 
   for ( uint32_t i = 1; i < NESTING_DEPTH; i++)
@@ -140,10 +139,10 @@ static void StartThread( void* arg )
         .threadArg = &donorParams[i],
         .threadPriority = thread_priority
     };
-    LOG( "Starting %s with priority: %d", name, thread_priority );
+    ConsoleLogLine( "Starting %s with priority: %d", name, thread_priority );
     TEST_ASSERT( KThreadCreate( &pTestData->threads[ i ], &params ) );
     /*
-    LOG ("%s should have priority %d.  Actual priority: %d.",
+    ConsoleLogLine ("%s should have priority %d.  Actual priority: %d.",
          name, thread_priority, KThreadGetPriority( &pTestData->threads[ i ] ) );
     snprintf (name, sizeof name, "interloper %d", i);
     interloperParams[ i ].i = i;
@@ -163,7 +162,7 @@ static void StartThread( void* arg )
   TEST_ASSERT_EQUAL_INT( NESTING_DEPTH - 1, pTestData->currentThreadIndexToRelease );
   KMutexUnlock( &locks[ 0 ] );
   /*
-  LOG("%s finishing with priority %d.\n", KThreadGetName( &pTestData->threads[ 0 ] ),
+  ConsoleLogLine("%s finishing with priority %d.\n", KThreadGetName( &pTestData->threads[ 0 ] ),
        KThreadGetPriority( &pTestData->threads[ 0 ] ) );
        */
   TEST_ASSERT( KThreadJoin( &pTestData->threads[ 1 ] ) && KThreadJoin( &pTestData->interloperThreads[ 1 ] ) );
@@ -196,7 +195,7 @@ DonorThreadFunction( void *args )
 
   if (pParams->lockPair.first)
     KMutexLock(pParams->lockPair.first, WAIT_FOREVER );
-  LOG( "%s priority %d, Actual priority: %d\n",
+  ConsoleLogLine( "%s priority %d, Actual priority: %d\n",
        KThreadGetName( pParams->pThread ), KThreadGetPriority( pParams->pThread ) );
   TEST_ASSERT_EQUAL_INT( pParams->i - 1, pParams->pTestData->currentThreadIndexToRelease );
   pParams->pTestData->currentThreadIndexToRelease = pParams->i;
@@ -205,7 +204,7 @@ DonorThreadFunction( void *args )
   pParams->pTestData->currentThreadIndexToRelease = NESTING_DEPTH - ( pParams->i + 1 );
   KMutexUnlock(pParams->lockPair.second);
   /*
-  LOG ("%s should have priority %d. Actual priority: %d\n",
+  ConsoleLogLine ("%s should have priority %d. Actual priority: %d\n",
        KThreadGetName( pParams->pThread ), (NESTING_DEPTH - 1) * 3,
        KThreadGetPriority( pParams->pThread ) );
        */
@@ -214,7 +213,7 @@ DonorThreadFunction( void *args )
     KMutexUnlock(pParams->lockPair.first);
 
 /*
-  LOG("%s finishing with priority %d.\n", KThreadGetName( pParams->pThread ),
+  ConsoleLogLine("%s finishing with priority %d.\n", KThreadGetName( pParams->pThread ),
        KThreadGetPriority( pParams->pThread ) );
        */
 }
@@ -223,7 +222,7 @@ static void
 InterloperThreadFunction( void *args )
 {
   InterloperParams* pParams = ( InterloperParams* )args;
-  LOG("%s finished.", KThreadGetName(pParams->pThread) );
+  ConsoleLogLine("%s finished.", KThreadGetName(pParams->pThread) );
 }
 
 TestRef PriorityDonateChainTest()

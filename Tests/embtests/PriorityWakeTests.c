@@ -26,7 +26,7 @@
 #include <ThreadInterface.h>
 #include <SemaphoreInterface.h>
 #include <stdio.h>
-#include <Logable.h>
+#include <ConsoleLog.h>
 
 typedef struct _SemPriWakeData
 {
@@ -46,7 +46,7 @@ static void SemaphorePriorityWakeThread( void *arg )
 {
   SemPriWakeData *pData = ( SemPriWakeData * ) arg;
   TEST_ASSERT( KSemaGet( pData->pSema, WAIT_FOREVER ));
-  LOG( "Current: %u\n", pData->priority );
+  ConsoleLogLine( "Current: %u\n", pData->priority );
   TEST_ASSERT( s_currentThreadPriority == pData->priority );
   s_currentThreadPriority--;
   KSemaPut( pData->pSema );
@@ -77,7 +77,7 @@ static void SemaphorePriorityWake( void )
   if( KSemaCreate( &sem, "SemPriWakeTest", 0 )) {
     for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
       char name[20] = {0};
-      sprintf( name, "Thread %d", i );
+      sprintf_s( name, sizeof( name ), "Thread %d", i );
       data[ i ].priority = priority;
       data[ i ].threadNum = i;
       data[ i ].pSema = &sem;
@@ -104,13 +104,13 @@ static void SemaphorePriorityWake( void )
     if( !KThreadCreate( &lastThread.thread, KTHREAD_PARAMS( threadLoPri ) )) {
       TEST_FAIL( "Couldn't create lowest priority thread" );
     }
-    KThreadJoin( &lastThread );
+    KThreadJoin( &lastThread.thread );
     for( uint32_t i = 0; i < NUM_OF_THREADS ; i++ ) {
-      KThreadJoin( &threads[ i ] );
+      KThreadJoin( &threads[ i ].thread );
     }
-    KThreadDelete( &lastThread );
+    KThreadDelete( &lastThread.thread );
     for( uint32_t i = 0; i < NUM_OF_THREADS; i++ ) {
-      KThreadDelete( &threads[ i ] );
+      KThreadDelete( &threads[ i ].thread );
     }
     KSemaDelete( &sem );
   }

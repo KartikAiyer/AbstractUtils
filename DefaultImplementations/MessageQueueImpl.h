@@ -24,9 +24,8 @@
 #ifndef __MESSAGE_QUEUE_IMPL_H__
 #define __MESSAGE_QUEUE_IMPL_H__
 
-#include "MutexInterface.h"
-#include "SemaphoreInterface.h"
-#include "Logable.h"
+#include <MutexInterface.h>
+#include <SemaphoreInterface.h>
 
 #ifdef __cplusplus
 extern "C" {

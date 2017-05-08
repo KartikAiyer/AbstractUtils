@@ -22,39 +22,48 @@
 * THE SOFTWARE.
 */
 
-#include <Logable.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdarg.h>
-#include <string.h>
+#include <ConsoleLog.h>
+#include <Log.h>
+#include <MutexInterface.h>
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-Logable g_generalLogger = { .prefix = 0, .enabled = true };  
-
-void Log( Logable *pLog, const char* pStr, ... )
+typedef struct _ConsoleLogStore
 {
-  va_list arguments;
-  va_start(arguments, pStr );
-  if( pLog && pLog->enabled ) {
-    uint32_t time = 0;
-    if( pLog->prefix ) {
-      printf("[%010u ms - %s]: ", ( unsigned int )time, pLog->prefix );
-    }
-    else{
-      printf( "[%010u ms]: ", ( unsigned int )time );
-    }
-    vprintf( pStr, arguments );
-    printf("\n");
+  TsLogBuffer *pCurrentLb;
+  KMutex mtx;
+  Logger generalLogger;
+  bool isInit;
+}ConsoleLogStore;
+
+static ConsoleLogStore s_console;
+
+void ConsoleLogInitialize()
+{
+  if ( !s_console.isInit ) {
+    s_console.isInit = true;
+    LogSystemInitialize();
+    KMutexCreate( &s_console.mtx, "ConsoleLog" );
+    s_console.generalLogger.fnPrefix = 0;
+    s_console.generalLogger.isEnabled = true;
+    s_console.pCurrentLb = LogSystemAllocateLogBuffer();
   }
-  va_end( arguments );
 }
 
-#ifdef __cplusplus
+void ConsoleLog( const char* pStr, ... )
+{
+  if ( s_console.isInit ) {
+    va_list args;
+    va_start( args, pStr );
+    Log( s_console.pCurrentLb, &s_console.generalLogger, NULL, pStr, args );
+    va_end( args );
+  }
 }
-#endif
 
+void ConsoleLogLine( const char* pStr, ... )
+{ 
+  if ( s_console.isInit ) {
+    va_list args;
+    va_start( args, pStr );
+    LogLine( s_console.pCurrentLb, &s_console.generalLogger, NULL, pStr, args );
+    va_end( args );
+  }
+}

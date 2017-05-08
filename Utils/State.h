@@ -25,11 +25,11 @@
 #ifndef __STATE_H__
 #define __STATE_H__
 
-#include "stdint.h"
-#include "stdbool.h"
-#include "stdio.h"
-#include "Logable.h"
-#include "klist.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <klist.h>
+#include <ConsoleLog.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,12 +100,11 @@ typedef bool (*StateIsValidEvent)( struct _State *pState, void *pEvent );
 typedef uint32_t (*StateHandleEvent)( struct _State *pState, void *pEvent );
 
 
-#define STATE_LOG(pState, str, ...)          (Log( (&(pState->dbg.log)), str, ##__VA_ARGS__))
+#define STATE_LOG(pState, str, ...)          (ConsoleLogLine( str, ##__VA_ARGS__))
 #define STATE_DEFAULT_LOGGING                (true)
 typedef struct _StateDebug
 {
   uint32_t numOfEvents;
-  Logable log;
 }StateDebug;
 
 /**

@@ -18,6 +18,7 @@ file( GLOB TOOLS_SOURCE ${TOOLS}/*.c ${TOOLS}/*.h )
 set( CMAKE_C_FLAGS "-m32" )
 set( CMAKE_EXE_LINKER_FLAGS "-m32" )
 
+add_definitions( -DNO_STDIO_PRINTF )
 add_library( embUnit STATIC ${EMB_SOURCE} )
 add_executable( embUnitSamples ${SAMPLE_SOURCE} )
 target_link_libraries( embUnitSamples embUnit )

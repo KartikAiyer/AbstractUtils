@@ -37,6 +37,7 @@ extern "C" {
 #include <stdint.h>
 #include <semphr.h>
 #include <InterfacePrivateCommon.h>
+#include <AbstractUtilsConfig.h>
 
 typedef void (*KThreadCallback)(void* arg);
 

@@ -85,7 +85,6 @@ typedef struct _StateMachine
   StateMachineDealloc fnMachineDealloc;
   void *pPrivate;
   bool stateMachineStarted;
-  Logable  logger;
 }StateMachine;
 
 

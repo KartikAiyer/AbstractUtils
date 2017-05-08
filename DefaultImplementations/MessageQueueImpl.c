@@ -23,6 +23,7 @@
  */
 
 #include <MessageQueue.h>
+#include <ConsoleLog.h>
 #include <assert.h>
 
 #ifdef __cplusplus
@@ -70,14 +71,14 @@ bool MessageQueueEnQueue( MessageQueue* pQueue, void *pItem )
         KMutexUnlock( &pQueue->mutex );
         retval = true;
       } else {
-        LOG( "%s(): Could'n't Get Queue Mutex", __FUNCTION__ );
+        ConsoleLogLine( "%s(): Could'n't Get Queue Mutex", __FUNCTION__ );
       }
     }
     else {
-      LOG( "%s(): Unable to Get Full Semaphore", __FUNCTION__ );
+      ConsoleLogLine( "%s(): Unable to Get Full Semaphore", __FUNCTION__ );
     }
   } else {
-    LOG( "%s(): Invalid Queue( %p ) or not init", __FUNCTION__, pQueue );
+    ConsoleLogLine( "%s(): Invalid Queue( %p ) or not init", __FUNCTION__, pQueue );
   }
   return retval;
 }
@@ -93,10 +94,10 @@ void* MessageQueueDeQueue( MessageQueue* pQueue )
         pQueue->tail = ( pQueue->tail + 1 ) % pQueue->size;
         KMutexUnlock( &pQueue->mutex );
       } else {
-        LOG( "%s(): Coulnd't Get Queue Mutex", __FUNCTION__ );
+        ConsoleLogLine( "%s(): Coulnd't Get Queue Mutex", __FUNCTION__ );
       }
     } else {
-      LOG( "%s(): Unable to Get Empty Semaphore", __FUNCTION__ );
+      ConsoleLogLine( "%s(): Unable to Get Empty Semaphore", __FUNCTION__ );
     }
   }
   return retval;

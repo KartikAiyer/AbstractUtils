@@ -42,6 +42,13 @@ if ( NOT WIN32 )
 	set( CMAKE_EXE_LINKER_FLAGS -m32 )
 endif( NOT WIN32 )
 
+set( LOG_MAX_LINE_LENGTH "512" CACHE STRING "The maximum length of the resulting string that can processed by a call to SystemLog()")
+set( SYSTEM_LOG_BUFFER_SIZE "1 << 11" CACHE STRING "The Size of the in memory System Log Buffer (default 2K)" )
+set( LOG_POOL_MAX_LOG_BUFFERS "10" CACHE STRING "The total number of LogBuffers that are available in the LogBufferPool" )
+set( LOG_POOL_LOG_BUFFER_SIZE "1 << 12" CACHE STRING "The size in bytes of each LogBuffer" )
+configure_file( ${PROJECT_SOURCE_DIR}/AbstractUtilsConfig.h.in ${PROJECT_BINARY_DIR}/AbstractUtilsConfig.h )
+include_directories( ${PROJECT_BINARY_DIR} )
+
 add_library( AbstractUtils STATIC ${SOURCES} )
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
   target_link_libraries( AbstractUtils ${CMAKE_THREAD_LIBS_INIT} )

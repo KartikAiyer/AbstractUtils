@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "MessageThread.h"
+#include <MessageThread.h>
 #include <assert.h>
-#include "Logable.h"
-#include "Pool.h"
-#include "MessageQueue.h"
-#include "ThreadInterface.h"
-#include "SemaphoreInterface.h"
+#include <ConsoleLog.h>
+#include <Pool.h>
+#include <MessageQueue.h>
+#include <ThreadInterface.h>
+#include <SemaphoreInterface.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,20 +45,18 @@ typedef struct _MessageThread
   MessageQueue messageQ;
   uint32_t messageSize;
   KSema sema; 
-  Logable log;
 }MessageThread;
 
 typedef struct _MessageThreadPool
 {
   uint8_t threadStore[ POOL_STORE_SIZE( MESSAGE_THREADS_MAX, sizeof( MessageThread ) ) ];
   MemPool threadPool;
-  Logable log;
 }MessageThreadPool;
 
-static MessageThreadPool s_threadPool = { .log = { .prefix = "MsgThrPool", .enabled = true } };
+static MessageThreadPool s_threadPool;
 
-#define MSG_POOL_LOG( str, ... )      Log( &s_threadPool.log, str, ##__VA_ARGS__ )
-#define MT_LOG( str, ... )  Log( &pThread->log, str, ##__VA_ARGS__ )
+#define MSG_POOL_LOG( str, ... )      ConsoleLogLine( str, ##__VA_ARGS__ )
+#define MT_LOG( str, ... )  ConsoleLogLine( str, ##__VA_ARGS__ )
 
 static void Thread( void *arg );
 
@@ -89,8 +87,6 @@ MessageThreadHandle MessageThreadCreate( const MessageThreadDef *pThreadParams )
       pThread->fnProcess = pThreadParams->fnProcess;
       pThread->pPrivateData = pThreadParams->pPrivateData;
       pThread->keepRunning = true;
-      pThread->log.prefix = pThread->threadName;
-      pThread->log.enabled = true;
       assert( pThread->fnInit && pThread->fnProcess );
 
       pMessageQArray = ( void** )( pThreadParams->messageBackingStore +
