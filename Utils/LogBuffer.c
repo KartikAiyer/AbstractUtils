@@ -33,7 +33,7 @@ bool LogBufferInit( LogBuffer* pLb,
   if( pLb && pBuffer && bufferSize ) {
     pLb->pBuffer = pBuffer;
     pLb->bufferSize = bufferSize;
-    pLb->head = pLb->tail;
+    pLb->head = pLb->tail = 0;
     pLb->isInit = true;
     retval = true;
   }
@@ -88,7 +88,17 @@ bool LogBufferPush( LogBuffer* pLb, char* pString, uint32_t stringSize )
   return retval;
 }
 
-
+bool LogBufferCharPop( LogBuffer* pLb, int8_t* pChar ) 
+{
+  bool retval = false;
+  if ( pLb && pChar && 
+       pLb->head != pLb->tail ) {
+    *pChar = pLb->pBuffer[ pLb->tail ];
+    pLb->tail = ( ( pLb->tail + 1 ) < pLb->bufferSize ) ? ( pLb->tail + 1 ) : 0;
+    retval = true;
+  }
+  return retval;
+}
 
 bool LogBufferIsEmpty( LogBuffer* pLb )
 {
@@ -111,3 +121,9 @@ static void LogBufferCharPush( LogBuffer* pLb, char item )
   }
 }
 
+void LogBufferClear( LogBuffer* pLb )
+{
+  if ( pLb && pLb->isInit ) {
+    pLb->head = pLb->tail = 0;
+  }
+}

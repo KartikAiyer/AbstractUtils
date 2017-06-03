@@ -24,6 +24,7 @@ if( WIN32 )
   include_directories( ${FRTOS_INCLUDE_PATH} )
   file( GLOB FREE_RTOS_INTERFACE_SOURCE ${FREE_RTOS_INTERFACE}/*.c ${FREE_RTOS_INTERFACE}/*.h )
   list( APPEND SOURCES ${FREE_RTOS_INTERFACE_SOURCE} )
+  set( CONFIG_USE_AUTILS_LOG_SYSTEM "CONFIG_DISABLE" CACHE STRING "Use the port agnostic Log System log buffer factory" )
 else( WIN32 )
   #TODO: Enable FreeRTOS in linux. For now uses Posix which is broken on linux
   set( POSIX_INTERFACE ${PROJECT_SOURCE_DIR}/PosixInterface )
@@ -46,6 +47,7 @@ set( LOG_MAX_LINE_LENGTH "512" CACHE STRING "The maximum length of the resulting
 set( SYSTEM_LOG_BUFFER_SIZE "1 << 11" CACHE STRING "The Size of the in memory System Log Buffer (default 2K)" )
 set( LOG_POOL_MAX_LOG_BUFFERS "10" CACHE STRING "The total number of LogBuffers that are available in the LogBufferPool" )
 set( LOG_POOL_LOG_BUFFER_SIZE "1 << 12" CACHE STRING "The size in bytes of each LogBuffer" )
+set( CONFIG_POOL_ALLOCATION_LOGS "CONFIG_DISABLE" CACHE STRING "Enable granular logging in Pool API")
 configure_file( ${PROJECT_SOURCE_DIR}/AbstractUtilsConfig.h.in ${PROJECT_BINARY_DIR}/AbstractUtilsConfig.h )
 include_directories( ${PROJECT_BINARY_DIR} )
 

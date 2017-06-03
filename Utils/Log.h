@@ -35,8 +35,11 @@ typedef struct _TsLogBuffer
   KMutex mtx;
 }TsLogBuffer;
 
+bool TsLogBufferInit( TsLogBuffer* pLb, char* pBuffer, uint32_t bufferSize, char* pLogBufferName );
 void LogSystemInitialize();
 TsLogBuffer* LogSystemAllocateLogBuffer();
+void LogSystemFreeLogBuffer( TsLogBuffer* pLogBuffer );
+bool LogSystemFlushLogBuffer( TsLogBuffer* pLb );
 void Log( TsLogBuffer* pLb, Logger* pLogger, void* pPrivate, const char* fmt, va_list args );
 void LogLine( TsLogBuffer* pLb, Logger* pLogger, void* pPrivate, const char* fmt, va_list args );
 

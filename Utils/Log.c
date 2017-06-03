@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 
+#ifdef CONFIG_USE_AUTILS_LOG_SYSTEM	
 #define LOG_POOL_SIZE         POOL_STORE_SIZE( LOG_POOL_MAX_LOG_BUFFERS, sizeof( TsLogBuffer ) + LOG_POOL_LOG_BUFFER_SIZE )
 
 typedef struct _LogPool
@@ -59,11 +60,7 @@ TsLogBuffer* LogSystemAllocateLogBuffer()
     retval = (TsLogBuffer*) PoolAlloc( &s_logPool.logBufferPool );
     if ( retval ) {
       memset( retval, 0, tsLogBufSize );
-      if ( KMutexCreate( &retval->mtx, "LogBuffer" ) ) {
-        retval->lb.bufferSize = LOG_POOL_LOG_BUFFER_SIZE;
-        retval->lb.pBuffer = ( uint8_t* )( retval )+tsLogBufSize; //The actual store is after the data structure in the pool allocated unit
-        retval->lb.isInit = true;
-      } else {
+      if ( !TsLogBufferInit( &retval->lb, (uint8_t*)(retval) + tsLogBufSize, LOG_POOL_LOG_BUFFER_SIZE, "LogBuffer" ) )
         PoolFree( &s_logPool.logBufferPool, retval );
         retval = 0;
       }
@@ -78,6 +75,25 @@ void LogSystemFreeLogBuffer( TsLogBuffer* pLogBuffer )
     KMutexDelete( &pLogBuffer->mtx );
     PoolFree( &s_logPool.logBufferPool, pLogBuffer );
   }
+}
+
+bool LogSystemFlushLogBuffer( TsLogBuffer* pLb )
+{
+#error "NEED IMPLEMENTATION"
+  return false;
+}
+#endif
+
+
+bool TsLogBufferInit( TsLogBuffer* pLb, char* pBuffer, uint32_t bufferSize, char* logBufferName )
+{
+  bool retval = false;
+  if ( pLb ) {
+    if ( KMutexCreate( &pLb->mtx, logBufferName ) ) {
+      retval = LogBufferInit( &pLb->lb, pBuffer, bufferSize );
+    }
+  }
+  return retval;
 }
 
 static int32_t LogWriteString( Logger* pLogger, void* pPrivate, const char* pStr, char* pBuffer, va_list args )

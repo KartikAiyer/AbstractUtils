@@ -33,7 +33,11 @@ extern "C" {
 #endif
 
 #undef POOL_LOG
+#ifdef CONFIG_POOL_ALLOCATION_LOGS
 #define POOL_LOG( str, ... )   ConsoleLogLine( str, ##__VA_ARGS__ )
+#else
+#define POOL_LOG( str, ... )
+#endif
 
 #define FREE_BITMASK_SIZE_IN_ULONG(numUnits)    CEIL_DIV( numUnits, SINGLE_BITMASK_CAPACITY )
 

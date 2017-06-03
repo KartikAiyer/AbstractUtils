@@ -30,4 +30,5 @@
 void ConsoleLogInitialize();
 void ConsoleLog( const char* pStr, ... );
 void ConsoleLogLine( const char* pStr, ... );
+void ConsoleLogFlush();
 #endif // __AUTILS_CONSOLE_LOG_H__

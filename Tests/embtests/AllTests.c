@@ -23,6 +23,7 @@
  */
 #include<embUnit.h>
 #include <ThreadInterface.h>
+#include <ConsoleLog.h>
 
 extern TestRef PoolTest_ApiTests();
 extern TestRef KThreadTest_ApiTests();
@@ -39,10 +40,12 @@ static void TestRunner( void* arg )
   {
     TestRunner_runTest( PoolTest_ApiTests() );
     TestRunner_runTest( KThreadTest_ApiTests() );
-    TestRunner_runTest( PriorityWakeTest() );
+    ConsoleLog( "ALL DONE\n" );
+    //TestRunner_runTest( PriorityWakeTest() );
     //TestRunner_runTest( PriorityDonateChainTest() );
   }
   TestRunner_end();
+  ConsoleLogFlush();
   for ( ; ; );
 }
 int main (int argc, const char* argv[])

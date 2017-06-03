@@ -75,5 +75,22 @@ bool LogBufferPush( LogBuffer* pLb, char* pString, uint32_t stringSize );
  */
 bool LogBufferIsEmpty( LogBuffer* pLb );
 
+/**
+ * LogBufferCharPop - Pops the character at the tail of the log buffer.
+ * Returns true for a successful read and false if the Log buffer is empty.
+ * 
+ * \param pLb - pointer to valid Log Buffer
+ * \param pChar - pointer to character which will contain popped value
+ * \return bool - false if log buffer is empty or invalid inputs.
+ */
+bool LogBufferCharPop( LogBuffer* pLb, int8_t* pChar );
+
+/**
+ * LogBufferClear - Resets the Log buffer. Data is not invalidated but all pointers
+ * are reset and the data will be overwritten. 
+ * 
+ * \param pLb - pointer to valid Log Buffer
+ */
+void LogBufferClear( LogBuffer* pLb );
 #endif
 

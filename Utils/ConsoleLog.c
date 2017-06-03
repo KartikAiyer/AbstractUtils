@@ -48,6 +48,18 @@ void ConsoleLogInitialize()
   }
 }
 
+void ConsoleLogFlush()
+{
+  if ( s_console.isInit ) {
+    KMutexLock( &s_console.mtx, WAIT_FOREVER );
+    TsLogBuffer* pLbToFlush = s_console.pCurrentLb;
+    s_console.pCurrentLb = LogSystemAllocateLogBuffer();
+    KMutexUnlock( &s_console.mtx );
+    if ( pLbToFlush ) {
+      LogSystemFlushLogBuffer( pLbToFlush );
+    }
+  }
+}
 void ConsoleLog( const char* pStr, ... )
 {
   if ( s_console.isInit ) {
