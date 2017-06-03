@@ -79,9 +79,7 @@ bool LogBufferPush( LogBuffer* pLb, char* pString, uint32_t stringSize )
   if( pLb && pLb->isInit && pString && stringSize < pLb->bufferSize ) {
     for( uint32_t i = 0; i < stringSize; i++ ) {
       char character = pString[i];
-      if ( false == LogBufferFilterCharacter( pLb, character ) ) {
-        LogBufferCharPush( pLb, character );
-      }
+      LogBufferCharPush( pLb, character );
     }
     retval = true;
   }
